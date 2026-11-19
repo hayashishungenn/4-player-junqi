@@ -433,7 +433,8 @@ class JunqiSelfPlayEnv:
             return ("WIN", 0.25) if att == 8 else ("LOSE", -0.1)
         r_att, r_dfd = PIECE_RANKS[att], PIECE_RANKS[dfd]
         if r_att > r_dfd:
-            val_map = {0: 0.8, 1: 0.5, 2: 0.3, 3: 0.2, 4: 0.15, 5: 0.1, 6: 0.08, 7: 0.05, 8: 0.05}
+            # 密集奖励信号改 10 倍强度，让 PPO 学会"主动猎杀"而非"躲避保守"
+            val_map = {0: 8.0, 1: 5.0, 2: 3.0, 3: 2.0, 4: 1.5, 5: 1.0, 6: 0.8, 7: 0.5, 8: 0.5}
             return "WIN", val_map[dfd]
         elif r_att < r_dfd:
             return "LOSE", -0.05
