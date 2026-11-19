@@ -14,13 +14,19 @@
 | `screen-11-color-check.png` | 选择黑方 |
 | `screen-12-difficulty-level.png` | 难度“专家（三级棋士）”与分档说明 |
 | `screen-13-ingame.png` | 对局中：玩家黑方、AI 红方、ELO 1800 |
+| `s14`–`s19` | 设置、开局、选子、走子、AI 回应 |
+| `s20`–`s22` | 暂停菜单、悔棋、认输终局 |
+| `s24`–`s29` | 主菜单、探析、游戏记录、复盘、胜率图、评分统计 |
+| `s40`–`s48` | 重启主菜单、残局入口、残局对局、提示按钮、残局暂停 |
 
 日志与进程证据见 `game-01/report/11-dynamic.md`：
 
 - `Player.log`：Unity 2020.3.15f2、Mono、Steam 初始化。
 - `Win32_Process`：两个 `pikafish.exe`，父进程为 `JustXiangqi.exe`，命令行指向 `StreamingAssets\AI\PikaFish\pikafish.exe`。
 
-## game-02（Just Go）
+## game-02（Just Go，已排除）
+
+用户确认未购买、不再安装。以下残留日志仅作背景，不计入交付：
 
 无截图（主体已卸载）。动态证据为应用自产日志：
 
