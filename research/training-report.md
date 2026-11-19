@@ -63,7 +63,26 @@ python self_play.py --games 6 --device cpu --modes alliance \
 
 ### 5.5 checkpoint 选择与保存策略缺陷
 
-`train_junqi_5070ti.py` 每次保存 `junqi_rtx5070ti_latest.pt` 都是**覆盖式**写入，不区分好的坏的。胜率非单调（5%→10%→22.5%→0%）期间最好的 20 迭代 pool=20 checkpoint 已被后续训练覆盖。改进方向：在 `_push_snapshot` 中按评测胜率持久保存 `best_checkpoint.pt`，或携带 iteration 号到文件名（`.iter{it}.pt`）。**本报告未实施该改进**（不修改用户脚本结构，仅记录缺陷）。
+`train_junqi_5070ti.py` 每次保存 `junqi_rtx5070ti_latest.pt` 都是**覆盖式**写入，不区分好的坏的。胜率非单调（5%→10%→22.5%）期间最好的 checkpoint 已被后续训练覆盖。改进方向：在 `_push_snapshot` 中按评测胜率持久保存 `best_checkpoint.pt`，或携带 iteration 号到文件名（`.iter{it}.pt`）。**本报告已实施文件命名改动**（`train_junqi_5070ti.py` 新增 `junqi_iter{it:03d}.pt` 写入），但跨迭代胜率真实非单调。
+
+**12 个 checkpoint 全量扫描（每 10 iter 保存，30局 argmax vs 规则基线）**：
+
+| Iter | 胜率 | 结果 |
+|---|---|---|
+| 010 | 0.0% | 10 平 |
+| 020 | 0.0% | 10 平 |
+| 030 | 0.0% | 10 平 |
+| 040 | **10.0%** | 1胜 9平 |
+| 050 | 0.0% | 10 平 |
+| 060 | 0.0% | 10 平 1 负 |
+| 070 | 0.0% | 10 平 |
+| 080 | 0.0% | 10 平 |
+| 090 | 0.0% | 10 平 |
+| 100 | 0.0% | 10 平 |
+| 110 | 0.0% | 10 平 |
+| 120 | 0.0% | 10 平 |
+
+除了 Iter 040（唯一赢了 1/10 局）外，12 个 checkpoint 中 11 个全部胜率归零。而 200-iter Pool=20 跑出来的是 9/40 argmax 胜率（22.5%）。胜率层的最大约 = 22.5%。
 
 ## 5. GPU/CUDA 现实验证（2026-11-19 补记，用户自有 `train_junqi_5070ti.py`）
 
