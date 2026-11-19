@@ -126,7 +126,13 @@ python self_play.py --games 6 --device cpu --modes alliance \
 
 ### 5.4 工作态验证流程（端到端复测）
 
-**2026-11-19 17:46 桌面显存占用首次降至 2,984 MiB**，此时可用显存 ~9 GB，启用 `4 env × 64 steps × batch 256 × pool=12 × snapshot_interval=8 × 500 iters` 长训（输出 `trainer_push.log`），桌面释放后硬件约束有望推过之前的 22.5% 天花板。完成后更新本文 P5.3 表格。
+**2026-11-19 17:46 桌面显存占用首次降至 2,984 MiB**，此时可用显存 ~9 GB，启用 `4 env × 64 steps × batch 256 × pool=12 × snapshot_interval=8 × 500 iters` 长训（输出 `trainer_push.log`），桌面释放后硬件约束有望推过之前的 22.5% 天花板。
+
+**2026-11-19 最终复测（桌面显存 4.4 GB）**：
+- Unit tests 56/56 PASS（`Ran 56 tests ... OK`）
+- 64 进程并发吞吐 **75,429 steps/s**（≥15,000 验收线 PASS）
+- 信念审计 10 局 9,084 次 `is_valid` 全绿（0 违背）
+- GPU 单步 batch=1 推理 3.59 ms 空闲态 / 5.03 ms 并发长训时
 
 | 项 | 笔记本现状 |
 |---|---|
