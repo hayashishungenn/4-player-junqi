@@ -51,6 +51,10 @@ def relation_team(mode, a, b):
 class Trainer:
     def __init__(self, args):
         self.args = args
+        random.seed(args.seed)
+        torch.manual_seed(args.seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(args.seed)
         self.device = torch.device(args.device)
         self.environment = LocalEnvironment()
         self.encoder = Encoder(self.environment.board, self.device)
@@ -138,25 +142,51 @@ class Trainer:
             return 0.0
         self.model.train()
         final_loss = 0.0
+        batch_size = max(1, self.args.batch_size)
         for _ in range(self.args.epochs):
             random.shuffle(samples)
-            self.optimizer.zero_grad()
-            losses = []
-            for seat, step, item in samples:
-                features = self.encoder.encode(item["state"])
-                actions = self.encoder.actions(item["moves"])
-                logits, value = self.model(features, self.encoder.adjacency, actions)
-                target = torch.tensor(returns[seat][step], device=self.device).clamp(-1, 1)
-                advantage = target - value.detach()
-                log_probability = torch.log_softmax(logits, 0)[item["choice"]]
-                probabilities = torch.softmax(logits, 0)
-                entropy = -(probabilities * torch.log_softmax(logits, 0)).sum()
-                losses.append(-log_probability * advantage + .5 * (value - target) ** 2 - .01 * entropy)
-            loss = torch.stack(losses).mean()
-            loss.backward()
-            nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-            self.optimizer.step()
-            final_loss = float(loss.detach())
+            epoch_loss = 0.0
+            batches = 0
+            for start in range(0, len(samples), batch_size):
+                chunk = samples[start:start + batch_size]
+                # 预编码 + 动态 padding 到一个 batch 张量
+                feats_list, acts_list, choices, targets, lengths = [], [], [], [], []
+                for seat, step, item in chunk:
+                    feats_list.append(self.encoder.encode(item["state"]))
+                    acts = self.encoder.actions(item["moves"])
+                    acts_list.append(acts)
+                    choices.append(item["choice"])
+                    targets.append(returns[seat][step])
+                    lengths.append(acts.shape[0])
+                max_actions = max(lengths)
+                pad = torch.zeros(max_actions, 2, dtype=torch.long, device=self.device)
+                padded_acts = []
+                mask_rows = []
+                for acts, length in zip(acts_list, lengths):
+                    if length < max_actions:
+                        padded_acts.append(torch.cat([acts, pad[:max_actions - length]], dim=0))
+                        mask_rows.append([True] * length + [False] * (max_actions - length))
+                    else:
+                        padded_acts.append(acts)
+                        mask_rows.append([True] * length)
+                features = torch.stack(feats_list)                     # B×N×F
+                actions = torch.stack(padded_acts)                     # B×M×2
+                action_mask = torch.tensor(mask_rows, dtype=torch.bool, device=self.device)
+                choice_t = torch.tensor(choices, device=self.device)
+                target_t = torch.tensor(targets, device=self.device, dtype=torch.float32).clamp(-1, 1)
+                log_probs, value = self.model.forward_batch(features, self.encoder.adjacency, actions, action_mask)
+                probs = log_probs.exp()
+                log_probability = log_probs.gather(1, choice_t.unsqueeze(1)).squeeze(1)
+                entropy = -(probs * log_probs).sum(dim=1)
+                advantage = target_t - value.detach()
+                loss = (-log_probability * advantage + .5 * (value - target_t) ** 2 - .01 * entropy).mean()
+                self.optimizer.zero_grad()
+                loss.backward()
+                nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+                self.optimizer.step()
+                epoch_loss += float(loss.detach())
+                batches += 1
+            final_loss = epoch_loss / max(1, batches)
         return final_loss
 
     def play(self, mode):
@@ -186,7 +216,7 @@ class Trainer:
                 print(f"[{index}/{self.args.games}] {mode} {result['winner']} "
                       f"步数={result['ply']} 各方决策={lengths} loss={loss:.4f}")
                 record = {"ts": int(time.time()), "index": index, "mode": mode,
-                          "winner": result["winner"], "ply": result["ply"],
+                          "seed": self.args.seed, "winner": result["winner"], "ply": result["ply"],
                           "loss": round(loss, 6), "trained_games": self.trained_games,
                           "device": str(self.device), "model": self.args.model}
                 with self.record_path.open("a", encoding="utf-8") as handle:
@@ -199,6 +229,17 @@ class Trainer:
             self.save()
             self.environment.close()
         stats["avg_loss"] = round(stats["loss_sum"] / max(1, stats["games"]), 6)
+        # P9.2：完整实验参数与设备记录，便于复现与棋力变化归因。
+        stats["experiment"] = {
+            "seed": self.args.seed, "games": self.args.games, "modes": self.args.modes,
+            "hidden": self.args.hidden, "learning_rate": self.args.learning_rate,
+            "temperature": self.args.temperature, "discount": self.args.discount,
+            "epochs": self.args.epochs, "batch_size": self.args.batch_size, "warmup_games": self.args.warmup_games,
+            "device": str(self.device),
+            "cuda_available": torch.cuda.is_available(),
+            "torch_version": torch.__version__,
+            "gpu_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+        }
         summary_path = self.record_path.with_name(self.record_path.stem + "-summary.json")
         summary_path.write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"训练记录：{self.record_path}；汇总：{summary_path}（{stats['games']} 局，平均 loss {stats['avg_loss']}）")
@@ -207,6 +248,7 @@ class Trainer:
 def parse_args():
     parser = argparse.ArgumentParser(description="四国军棋神经网络 BOT 离线自我对弈训练")
     parser.add_argument("--games", type=int, default=1000)
+    parser.add_argument("--seed", type=int, default=7, help="随机种子（布阵/选点/初始化可复现）")
     parser.add_argument("--model", default="model.pt")
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--hidden", type=int, default=128)
@@ -214,6 +256,7 @@ def parse_args():
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--discount", type=float, default=.997)
     parser.add_argument("--epochs", type=int, default=2)
+    parser.add_argument("--batch-size", type=int, default=64, help="批量训练样本数（提升 GPU 利用率）")
     parser.add_argument("--warmup-games", type=int, default=200)
     parser.add_argument("--save-every", type=int, default=10)
     parser.add_argument("--record", default="training-records.jsonl", help="每局训练记录（JSONL）输出路径")

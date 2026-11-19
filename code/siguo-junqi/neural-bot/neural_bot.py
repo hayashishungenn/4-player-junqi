@@ -89,6 +89,7 @@ class GraphPolicyValue(nn.Module):
         self.value = nn.Sequential(nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 1), nn.Tanh())
 
     def forward(self, features, adjacency, actions):
+        """单样本前向（兼容原有接口）。features: N×F, actions: M×2。"""
         h = torch.relu(self.input(features))
         for layer, norm in zip(self.message, self.norm):
             h = norm(h + torch.relu(layer(adjacency @ h)))
@@ -100,6 +101,34 @@ class GraphPolicyValue(nn.Module):
         else:
             logits = torch.empty(0, device=features.device)
         return logits, self.value(pooled).squeeze(0)
+
+    def forward_batch(self, features, adjacency, actions, action_mask):
+        """批量前向：把 B 个局面堆成一个 batch，一次 bmm + 一次 action 打分。
+        features: B×N×F, adjacency: N×N, actions: B×M×2, action_mask: B×M (bool, 有效着法)。
+        返回 logits(B×M), values(B)。padding 位置 logits 置 -inf，softmax 权重为 0。
+        """
+        h = torch.relu(self.input(features))                      # B×N×H
+        batch = h.shape[0]
+        adj = adjacency.unsqueeze(0).expand(batch, -1, -1)        # B×N×N
+        for layer, norm in zip(self.message, self.norm):
+            h = norm(h + torch.relu(layer(torch.bmm(adj, h))))    # B×N×H
+        pooled = h.mean(1)                                        # B×H
+        idx = actions.clamp(max=h.shape[1] - 1)
+        src = torch.gather(h, 1, idx[:, :, 0].unsqueeze(-1).expand(-1, -1, h.shape[-1]))
+        dst = torch.gather(h, 1, idx[:, :, 1].unsqueeze(-1).expand(-1, -1, h.shape[-1]))
+        g = pooled.unsqueeze(1).expand_as(src)
+        pair = torch.cat([src, dst, g], dim=-1)                   # B×M×3H
+        logits = self.action(pair).squeeze(-1)                    # B×M
+        # 对合法动作做数值稳定 softmax（减 max 后 exp）；padding 位置 log_prob=0。
+        masked = logits.masked_fill(~action_mask, float("-inf"))
+        max_logit = masked.max(dim=1, keepdim=True).values
+        max_logit = torch.where(torch.isfinite(max_logit), max_logit, torch.zeros_like(max_logit))
+        shifted = (logits - max_logit).masked_fill(~action_mask, float("-inf"))
+        exp_vals = shifted.exp()
+        sum_vals = exp_vals.sum(dim=1, keepdim=True).clamp_min(1e-8)
+        log_probs = (shifted - sum_vals.log()).masked_fill(~action_mask, 0.0)
+        values = self.value(pooled).squeeze(-1)                   # B
+        return log_probs, values
 
 
 class Encoder:

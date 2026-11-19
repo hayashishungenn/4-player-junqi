@@ -11,7 +11,7 @@ import { emojis as EMOJIS } from '../public/emojis.js';
 import { installBotApi } from "./bot-api.js";
 import { installHostedBots } from "./hosted-bots.js";
 import { debouncedWriter } from "./persist.js";
-import { analyzeReplay } from "../bots/engine/replay-analysis.js";
+import { submitAnalysis, analysisStats, taskKey } from "./analysis-runner.js";
 import { botView } from "../bots/engine/bot.js";
 import { chooseStrongMove } from "../bots/engine/search.js";
 import fs from "node:fs";
@@ -628,15 +628,29 @@ app.get('/api/rooms/:code/analysis', async (req, res) => {
   const code = req.params.code;
   if (!validAnalysisCode(code)) return res.status(400).json({ error: '房间码不合法' });
   const room = rooms.get(code);
-  if (room && !(user.admin || isSuperAdmin(user.username) || canEnter(user.username, code)))
-    return res.status(403).json({ error: '无权查看本局分析' });
+  const isAdmin = !!user.admin || !!(user.username && isSuperAdmin(user.username));
+  let report;
   try {
-    const report = JSON.parse(await fsp.readFile(analysisPath(code), 'utf8'));
-    res.json(report);
+    report = JSON.parse(await fsp.readFile(analysisPath(code), 'utf8'));
   } catch (error) {
     if (error.code === 'ENOENT') return res.status(404).json({ error: '尚无保存的分析报告' });
     res.status(500).json({ error: '读取分析报告失败' });
+    return;
   }
+  if (!isAdmin) {
+    if (!user.username) return res.status(403).json({ error: '无权查看本局分析' });
+    if (room) {
+      // 房间仍存在：沿用进入房间的权限判定（管理者另行放行）。
+      if (!canEnter(user.username, code)) return res.status(403).json({ error: '无权查看本局分析' });
+    } else {
+      // 房间已关闭：只认持久化报告中的参与者白名单，禁止猜测房间码越权读取。
+      const allowed = report?.access?.allowedUsers;
+      const username = canonicalUsername(user.username);
+      if (!Array.isArray(allowed) || !allowed.some(name => canonicalUsername(name) === username))
+        return res.status(403).json({ error: '无权查看本局分析' });
+    }
+  }
+  res.json(report);
 });
 app.post('/api/rooms/:code/analysis', async (req, res) => {
   res.set('Cache-Control', 'no-store');
@@ -652,7 +666,21 @@ app.post('/api/rooms/:code/analysis', async (req, res) => {
   const maxMoves = Math.min(80, Math.max(1, Number(req.body?.maxMoves) || 60));
   try {
     const subset = { ...room.replay, logs: (room.replay.logs || []).filter(l => l.kind === 'move').slice(0, maxMoves) };
-    const report = analyzeReplay(subset, { budgetMs, mode: room.mode, seed: 7 });
+    const key = taskKey({ code: room.code, maxMoves, budgetMs, replay: subset });
+    let report;
+    try {
+      report = await submitAnalysis(key, subset, { budgetMs, mode: room.mode, seed: 7 });
+    } catch (error) {
+      return res.status(500).json({ error: '分析失败：' + error.message, code: error.code || 'ANALYSIS_FAILED' });
+    }
+    // 持久化访问权限：仅本局参与者（含 BOT 账号）与管理员可在房间关闭后读取。
+    const participants = new Set();
+    for (const player of room.players || []) {
+      const name = player.username || player.name;
+      if (name) participants.add(canonicalUsername(name));
+    }
+    for (const log of room.replay.logs || []) if (log.username) participants.add(canonicalUsername(log.username));
+    report.access = { code: room.code, allowedUsers: [...participants], createdAt: Date.now() };
     try {
       await fsp.mkdir(path.dirname(analysisPath(room.code)), { recursive: true });
       await fsp.writeFile(analysisPath(room.code), JSON.stringify(report), 'utf8');
@@ -667,6 +695,7 @@ app.post('/api/rooms/:code/analysis', async (req, res) => {
     res.status(500).json({ error: '分析失败：' + error.message });
   }
 });
+app.get('/api/analysis/status', (req, res) => res.json(analysisStats()));
 // AI 提示：仅暗棋对局中、当前轮到的真人可请求；只返回着法，不泄露任何隐藏兵种。
 app.post('/api/rooms/:code/hint', async (req, res) => {
   res.set('Cache-Control', 'no-store');
@@ -1501,7 +1530,9 @@ function applyMove(room, player, from, to) {
     if(defender&&room.visibility==='light'){attacker.revealed=true;defender.revealed=true;}
     else if(defender&&room.visibility==='semi')defender.revealed=true;
     const outcome = resolveBattle(attacker, defender);
-    if (room.replay) room.replay.logs.push({ time: Date.now(), kind: 'move', seat: player.seat, username: player.username, from, to,
+    if (room.replay) room.replay.logs.push({ time: Date.now(), kind: 'move',
+      frameIndex: Math.max(0, (room.replay.frames?.length || 1) - 1),
+      seat: player.seat, username: player.username, from, to,
       attacker: { id: attacker.id, type: attacker.type }, defender: defender ? { id: defender.id, type: defender.type, owner: defender.owner } : null,
       outcome, engineerTurn, path: route });
     if (defender) {

@@ -56,13 +56,15 @@ function historyForSeat(logs, ply, seat) {
 /**
  * 对一份完整 replay 生成分析报告。
  * @param {object} replay {frames:[{state:{pieces,turn,players,phase,lastMove}}], logs:[...], winner, ...}
- * @param {object} options budgetMs / mode / seed / maxCandidates / maxSamples
+ * @param {object} options budgetMs / totalBudgetMs / mode / seed / maxCandidates / maxSamples
  */
 export function analyzeReplay(replay, options = {}) {
   const {
     budgetMs = 900, mode = replay.mode || 'alliance', seed = 7,
-    maxCandidates = 12, maxSamples = 32,
+    maxCandidates = 12, maxSamples = 32, totalBudgetMs = 0,
   } = options;
+  const overallDeadline = Number.isFinite(totalBudgetMs) && totalBudgetMs > 0
+    ? Date.now() + totalBudgetMs : Infinity;
   const frames = replay.frames || [];
   const logs = (replay.logs || []).filter(l => l.kind === 'move' && l.from && l.to);
   const seatsFromPlayers = frames[0]?.state?.players
@@ -76,20 +78,40 @@ export function analyzeReplay(replay, options = {}) {
   const moves = [];
 
   logs.forEach((log, i) => {
-    const frame = frames[i];
+    // 新版棋谱在走子时记录 frameIndex，精确定位走子前局面；
+    // 旧版棋谱回退到顺序映射 i。认输/淘汰等非走子事件也会产生帧，顺序映射可能错位。
+    const frameIndex = Number.isInteger(log.frameIndex) ? log.frameIndex : i;
+    const frame = frames[frameIndex];
     if (!frame?.state?.pieces) {
       moves.push({ ply: i + 1, seat: log.seat, from: log.from, to: log.to,
-        analysis: { ok: false, errorClass: 'unknown', explanation: '缺少走子前局面帧。', calibrationNote: CALIBRATION_NOTE },
+        analysis: { ok: false, errorClass: 'unknown', explanation: '缺少走子前局面帧。', calibrationNote: CALIBRATION_NOTE,
+          coverage: { legalMoves: 0, evaluated: 0, ratio: 0, exhaustive: false },
+          moveClasses: { bestCandidate: null, bestEvaluated: null, actualMove: { from: log.from, to: log.to },
+            unsearchedPotentialBest: '未知（未分析）' } },
         truth: truthOf(log), perspective: { analysis: 'dark', truth: 'open' } });
       return;
     }
+    const remaining = overallDeadline - Date.now();
+    if (remaining <= 0) {
+      moves.push({ ply: i + 1, seat: log.seat, username: log.username || null,
+        from: log.from, to: log.to,
+        analysis: { ok: false, errorClass: 'unanalyzed', explanation: '整局计算预算耗尽，未分析该步。',
+          calibrationNote: CALIBRATION_NOTE, infoView: 'dark',
+          coverage: { legalMoves: 0, evaluated: 0, ratio: 0, exhaustive: false },
+          moveClasses: { bestCandidate: null, bestEvaluated: null, actualMove: { from: log.from, to: log.to },
+            unsearchedPotentialBest: '未知（未分析）' } },
+        truth: truthOf(log), perspective: { analysis: 'dark', truth: 'open' } });
+      return;
+    }
+    // 整局预算按剩余棋步均摊，避免前几步耗尽导致后续全部未分析。
+    const stepBudget = Math.max(1, Math.min(budgetMs, remaining / Math.max(1, logs.length - i)));
     const activeSeats = (frame.state.players || []).filter(p => !p.eliminated).map(p => p.seat);
     const view = projectFrame(frame.state, log.seat, mode,
       activeSeats.length ? activeSeats : seatsFromPlayers);
     view.battles = publicBattles(logs, i);
     const analysis = evaluateMoveSet(view, { from: log.from, to: log.to },
       historyForSeat(logs, i, log.seat),
-      { budgetMs, maxCandidates, maxSamples, rng });
+      { budgetMs: stepBudget, maxCandidates, maxSamples, rng });
     moves.push({
       ply: i + 1, seat: log.seat, username: log.username || null,
       from: log.from, to: log.to,
@@ -99,11 +121,15 @@ export function analyzeReplay(replay, options = {}) {
         errorClass: analysis.errorClass, samples: analysis.samples, depth: analysis.depth,
         explanation: analysis.explanation, calibrationNote: analysis.calibrationNote,
         infoView: analysis.infoView,
+        coverage: analysis.coverage, moveClasses: analysis.moveClasses,
       },
       truth: truthOf(log),
       perspective: { analysis: 'dark', truth: 'open' },
     });
   });
+
+  const unanalyzed = moves.filter(m => m.analysis.errorClass === 'unanalyzed').length;
+  if (unanalyzed) warnings.push(`整局计算预算耗尽，${unanalyzed} 步未完成分析。`);
 
   const order = ['best', 'good', 'inaccuracy', 'mistake', 'blunder'];
   const perSeat = {};

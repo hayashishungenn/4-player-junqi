@@ -84,6 +84,11 @@ export function evaluateMoveSet(view, actualMove = null, history = [], options =
     ok: false, infoView: 'dark', candidates: [], best: null, actual: null,
     scoreLoss: 0, errorClass: 'none', samples: 0, depth: 0,
     elapsedMs: 0, explanation: '无合法着法。', calibrationNote: CALIBRATION_NOTE,
+    coverage: { legalMoves: 0, evaluated: 0, ratio: 0, exhaustive: false },
+    moveClasses: {
+      bestCandidate: null, bestEvaluated: null, actualMove: null,
+      unsearchedPotentialBest: '未知（未搜索的着法可能更优）',
+    },
   };
   if (!legal.length) return base;
 
@@ -150,10 +155,28 @@ export function evaluateMoveSet(view, actualMove = null, history = [], options =
   const scoreLoss = best && actual ? Math.max(0, Number((best.score - actual.score).toFixed(2))) : 0;
   const errorClass = actual ? classifyLoss(scoreLoss) : 'none';
 
+  // 覆盖率与四类着法区分（P10 校准）：
+  // - bestCandidate：根先验排序第一的着法（廉价启发式，非搜索结论）。
+  // - bestEvaluated：实际参与搜索的候选中得分最高者（本模块 best 的真实含义）。
+  // - actualMove：实战着法。
+  // - unsearchedPotentialBest：未进入候选集的着法，可能存在更优解，未知。
+  const exhaustive = evaluated.length >= legal.length;
+  const coverage = {
+    legalMoves: legal.length, evaluated: evaluated.length,
+    ratio: legal.length ? Number((evaluated.length / legal.length).toFixed(4)) : 0,
+    exhaustive,
+  };
+  const moveClasses = {
+    bestCandidate: ranked[0] ? { from: ranked[0].from, to: ranked[0].to } : null,
+    bestEvaluated: best ? { from: best.from, to: best.to, score: best.score } : null,
+    actualMove: actualMove ? { from: actualMove.from, to: actualMove.to } : null,
+    unsearchedPotentialBest: exhaustive ? '无（已穷尽全部合法着法）' : '未知（未搜索的着法可能更优）',
+  };
+
   return {
     ...base, ok: !!actual, candidates: evaluated, best, actual,
     scoreLoss, errorClass, samples, depth: maxDepth,
-    elapsedMs: Date.now() - started,
+    elapsedMs: Date.now() - started, coverage, moveClasses,
     explanation: explain(view, best, actual, actualMove, scoreLoss),
   };
 }

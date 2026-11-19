@@ -1,0 +1,151 @@
+{
+  "mode": "alliance",
+  "games": 500,
+  "agents": [
+    "strong:10",
+    "strong:30"
+  ],
+  "outcomes": {
+    "flag": 248,
+    "stalemate": 168,
+    "auto-draw": 84
+  },
+  "totalErrors": 0,
+  "totalUnresolved": 84,
+  "stats": {
+    "strong:10": {
+      "games": 500,
+      "wins": 184,
+      "losses": 232,
+      "draws": 0,
+      "unresolved": 84,
+      "errors": 0,
+      "plies": 67269,
+      "battles": 28356,
+      "samples": 97,
+      "depth": 291,
+      "moves": 33852,
+      "ms": 356005,
+      "bySeat": {
+        "north": 250,
+        "south": 250,
+        "east": 250,
+        "west": 250
+      },
+      "bySetup": {
+        "0": 21,
+        "1": 21,
+        "2": 21,
+        "3": 21,
+        "4": 21,
+        "5": 21,
+        "6": 21,
+        "7": 21,
+        "8": 21,
+        "9": 21,
+        "10": 21,
+        "11": 21,
+        "12": 21,
+        "13": 21,
+        "14": 21,
+        "15": 21,
+        "16": 21,
+        "17": 21,
+        "18": 21,
+        "19": 21,
+        "20": 20,
+        "21": 20,
+        "22": 20,
+        "23": 20
+      },
+      "byOutcome": {
+        "flag": 248,
+        "stalemate": 168,
+        "auto-draw": 84
+      },
+      "winRateLow": 0.32688381653354137,
+      "winRateHigh": 0.41112908275861715,
+      "winRate": 0.368,
+      "drawRate": 0,
+      "avgPlies": 134.54,
+      "avgBattles": 56.71,
+      "avgSamplesPerMove": 0,
+      "avgDepth": 0.01,
+      "avgMsPerMove": 10.52,
+      "decided": 416
+    },
+    "strong:30": {
+      "games": 500,
+      "wins": 232,
+      "losses": 184,
+      "draws": 0,
+      "unresolved": 84,
+      "errors": 0,
+      "plies": 67269,
+      "battles": 28356,
+      "samples": 27769,
+      "depth": 72480,
+      "moves": 33417,
+      "ms": 1008694,
+      "bySeat": {
+        "east": 250,
+        "west": 250,
+        "north": 250,
+        "south": 250
+      },
+      "bySetup": {
+        "0": 21,
+        "1": 21,
+        "2": 21,
+        "3": 21,
+        "4": 21,
+        "5": 21,
+        "6": 21,
+        "7": 21,
+        "8": 21,
+        "9": 21,
+        "10": 21,
+        "11": 21,
+        "12": 21,
+        "13": 21,
+        "14": 21,
+        "15": 21,
+        "16": 21,
+        "17": 21,
+        "18": 21,
+        "19": 21,
+        "20": 20,
+        "21": 20,
+        "22": 20,
+        "23": 20
+      },
+      "byOutcome": {
+        "flag": 248,
+        "stalemate": 168,
+        "auto-draw": 84
+      },
+      "winRateLow": 0.4207274028995594,
+      "winRateHigh": 0.5078215696346657,
+      "winRate": 0.464,
+      "drawRate": 0,
+      "avgPlies": 134.54,
+      "avgBattles": 56.71,
+      "avgSamplesPerMove": 0.83,
+      "avgDepth": 2.17,
+      "avgMsPerMove": 30.19,
+      "decided": 416
+    }
+  },
+  "pairwise": {
+    "strong:10 vs strong:30": {
+      "aWins": 184,
+      "bWins": 232,
+      "draws": 0,
+      "n": 500,
+      "aWinRate": 0.368,
+      "bWinRate": 0.464,
+      "drawRate": 0,
+      "eloDiff": -94
+    }
+  }
+}

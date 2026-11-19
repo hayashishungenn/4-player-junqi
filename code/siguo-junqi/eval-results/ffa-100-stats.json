@@ -1,0 +1,135 @@
+{
+  "mode": "ffa",
+  "games": 100,
+  "agents": [
+    "strong:10",
+    "strong:30"
+  ],
+  "outcomes": {
+    "stalemate": 56,
+    "flag": 31,
+    "auto-draw": 13
+  },
+  "totalErrors": 0,
+  "totalUnresolved": 13,
+  "stats": {
+    "strong:10": {
+      "games": 100,
+      "wins": 33,
+      "losses": 54,
+      "draws": 0,
+      "unresolved": 13,
+      "errors": 0,
+      "plies": 13943,
+      "battles": 6029,
+      "samples": 0,
+      "depth": 0,
+      "moves": 6879,
+      "ms": 74191,
+      "bySeat": {
+        "north": 50,
+        "south": 50,
+        "east": 50,
+        "west": 50
+      },
+      "bySetup": {
+        "0": 7,
+        "1": 7,
+        "2": 7,
+        "3": 7,
+        "4": 6,
+        "5": 6,
+        "6": 6,
+        "7": 6,
+        "8": 6,
+        "9": 6,
+        "10": 6,
+        "11": 6,
+        "12": 6,
+        "13": 6,
+        "14": 6,
+        "15": 6
+      },
+      "byOutcome": {
+        "stalemate": 56,
+        "flag": 31,
+        "auto-draw": 13
+      },
+      "winRateLow": 0.24562983793895452,
+      "winRateHigh": 0.4269483966028862,
+      "winRate": 0.33,
+      "drawRate": 0,
+      "avgPlies": 139.43,
+      "avgBattles": 60.29,
+      "avgSamplesPerMove": 0,
+      "avgDepth": 0,
+      "avgMsPerMove": 10.79,
+      "decided": 87
+    },
+    "strong:30": {
+      "games": 100,
+      "wins": 54,
+      "losses": 33,
+      "draws": 0,
+      "unresolved": 13,
+      "errors": 0,
+      "plies": 13943,
+      "battles": 6029,
+      "samples": 1974,
+      "depth": 5739,
+      "moves": 7064,
+      "ms": 211613,
+      "bySeat": {
+        "east": 50,
+        "west": 50,
+        "north": 50,
+        "south": 50
+      },
+      "bySetup": {
+        "0": 7,
+        "1": 7,
+        "2": 7,
+        "3": 7,
+        "4": 6,
+        "5": 6,
+        "6": 6,
+        "7": 6,
+        "8": 6,
+        "9": 6,
+        "10": 6,
+        "11": 6,
+        "12": 6,
+        "13": 6,
+        "14": 6,
+        "15": 6
+      },
+      "byOutcome": {
+        "stalemate": 56,
+        "flag": 31,
+        "auto-draw": 13
+      },
+      "winRateLow": 0.44264685393523856,
+      "winRateHigh": 0.6343935614666815,
+      "winRate": 0.54,
+      "drawRate": 0,
+      "avgPlies": 139.43,
+      "avgBattles": 60.29,
+      "avgSamplesPerMove": 0.28,
+      "avgDepth": 0.81,
+      "avgMsPerMove": 29.96,
+      "decided": 87
+    }
+  },
+  "pairwise": {
+    "strong:10 vs strong:30": {
+      "aWins": 33,
+      "bWins": 54,
+      "draws": 0,
+      "n": 100,
+      "aWinRate": 0.33,
+      "bWinRate": 0.54,
+      "drawRate": 0,
+      "eloDiff": -123
+    }
+  }
+}
