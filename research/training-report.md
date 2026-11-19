@@ -92,6 +92,45 @@ python self_play.py --games 6 --device cpu --modes alliance \
 | 早期 | 规则基线（pool=1） | 80×128 / 128 | 1.82 GB | 5.0%（argmax 2/40） |
 | Pool≥10 | self-play 池（pool=10） | 120×128 / 128 | 3.38 GB | 10.0%（4/40） |
 | Pool≥20 | self-play 池（pool=20） | 200×128 / 256 | 6.08 GB | **22.5%**（9/40） |
-| Pool≥20（长训中） | self-play 池（pool≥20） | 400×64 / 256 | 6.08–7 GB | 长训中，完成后更新 |
+| Pool≥15 | self-play 池（pool=15） | 150×128 / 128 | 3.8 GB | 10.0%（argmax 3/30） |
 
-密集获取奖励 ×10 修复（`val_map` ×10）：纯和局塌陷后 Rew 转正，但 argmax 胜率在本会话 02 轮仍然单 MPDL。
+密集获取奖励 ×10 修复（`val_map` ×10）：纯和局塌陷后 Rew 转正（+0.005~+0.07/步段）。最大 checkpoint 为 Pool=20 Iter=200，胜率 22.5%（9/40 argmax）。
+
+密集获取奖励 \u00d710 不单独胜出——两次要联动：
+1. Multi-snapshot opponent pool（`opponent_pool_enabled=True`）：胜率 5%→10→22.5%，显式可复现
+2. \u00d710 密集 reward：使模型从纯 draw 塌陷逃脱
+
+### 5.4 环境约束（决定为何 5×10^7 步不可及）
+
+| 项 | 笔记本现状 |
+|---|---|
+| 显存总量 | 11.9 GB |
+| 桌面进程占用 | 8.2 GB（Edge / 微信 / 钉钉 / Telegram / QQ 等多进程） |
+| 有效训练显存 | ~3.7 GB（实测仅 2 env × 64 steps × batch 128 稳定） |
+| Windows Pagefile | 2.5 GB |
+| 提交限制 | 32 GB（FreePhysical 6.3 GB + FreeVirtual 2.5 GB） |
+| 12 env × 128 steps × batch 512 | OOM `WinError 1455`（页面文件太小）或 `CUDA out of memory` |
+| 24 env（用户配置） | OOM 不可启动 |
+| 8 env × 250 iterations | 崩溃于 snapshot 深拷贝弹窗（桌面 GPU 竞争） |
+| 4 env × 200 iterations × batch 256 | `CUDA error: out of memory` |
+| 1 env × 32 steps × batch 32 | `CUBLAS_STATUS_EXECUTION_FAILED`（GPU 被桌面抢占时） |
+
+**结论**：5×10^7 步预算需要 1000+ 小时连续训练，本会话桌面共享 11.9 GB VRAM 最高仅可跑通 2 env × 64 steps 串行训练。目标胜率 65%>>**22.5%** 需要远超单会话时长。
+
+## 6. 任务书阶段完成度矩阵
+
+| 阶段 | 验收项 | 状态 |
+|---|---|---|
+| 阶段一（环境） | 64进程吞吐 ≥15,000 SPS | ✅ 270,070 SPS PASS |
+| 阶段一（单测） | 56/56 单测 100% | ✅ |
+| 阶段一信念追踪 | 零违背 | ✅ audit 26,388次 is_valid 0 违背 |
+| 阶段二启发式 Bot | 对随机胜率 ≥99% | ✅ **100%** 排除和局/96-97% 含和局 |
+| 阶段二布阵库 | ≥50套 | ✅ **400套** 校验 0 违背 |
+| 阶段三「固定规则基线」 | 训练链路可运行 | ✅ BF16 AMP 真跑 |
+| 阶段三胜率 ≥65% | checkpoint | ❌ 实测 22.5%（Pool=20 200 iter） |
+| 阶段四 FSP 5×10^7 步 | 对战胜率 ≥80% | ❌ 无法启动 |
+| 阶段五 Top-200 差异化布阵 | ≥200套 | ✅ 已入库（heuristic-fitness） |
+| 阶段五 GA 50代 | 行棋模型 fitness | ❌ 50 代未启动 |
+| 阶段五 GPU 单步推理 | <5 ms | ✅ 3.53 ms |
+| 阶段五 ONNX 导出 | ✓ | ✅ |
+| 信念×2 2v2奖励共享 50% | ✓ 已实现于 `rewards[ally]=0.5*reward` | ✅ |
