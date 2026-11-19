@@ -237,7 +237,8 @@ python self_play.py --games 6 --device cpu --modes alliance \
 1. **已完成的会不成为盲点**：
    - 阶段一空位（规则引擎+AECEnv+信念追踪+64进程吞吐+56单测+信念审计）—— 100% 交付
    - 阶段二（启发式 Bot，~96% vs 随机）—— 交付（严格≥99%未达成 96% 口径）
-   - 阶段五 OF phase-existence；56 项单测+信念审计+200 布阵+ONNX✓ ：交付
+   - 阶段二（启发式 Bot ~96% vs 随机）—— 交付：严格≥99%未达成，含和局 96%、排除和局 100%
+   - 阶段五部分（布阵库 + ONNX + <5ms 推理）交付但无 GA 50代 fitness 强度支撑
 2. **未达成本原因**：用户自有 `train_junqi_5070ti.py` 是典型从头 PPO 学习问题，从随机初始化开始需要 ≥5×10^7 步才有信号可学（即便稠密奖励加大幅度 ×10，checkpoint 胜率仍然在 0%~22.5% 之间徘徊，非单调）。桌面进程稳定占用 8~9 GB VRAM，24 env × 512 steps × batch 4096 16 env × 128 steps × batch 512 等显著大于本机容量的配置全部 OOM 崩溃。能跑通的是 2 env × 64 steps × batch 128。
 3. **突破前置条件**（需要用户行动，超出本会话范围）：
    - 关闭 GPU 桌面 GPU 占用进程（Chrome / Edge / BaiduNetdisk / 钉钉 / QQ / Telegram / MSN：全部退出）
