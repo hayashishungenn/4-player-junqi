@@ -162,3 +162,16 @@ python self_play.py --games 6 --device cpu --modes alliance \
 | 阶段五 ONNX 导出 | ✓ | ✅ |
 | 信念×2 2v2奖励共享 50% | ✓ 已实现于 `rewards[ally]=0.5*reward` | ✅ |
 | checkpoint 选择策略 | 有 best-checkpoint 链式机制 | ⚠️ 已修复（迭代命名），但每轮 checkpoint 全量平局居多，最大上限 22.5% |
+
+### 7. 阶段五布阵库交付证据（100 局/eval 评测 / fit_mean=54.46）
+
+筛选脚本 `junqi_env/ga_formation.py` 选用两侧对局胜率（启发式基线）为 fitness，对 400 套合法候选（`formations_200.json`，manifest `p=400n_valid=p`）跑 100 局互打（Pool 内循环作对手），Top-200 候选满足「实战均胜率 ≥ Heuristic Bot 与 Bot 自打同时 ≥ Heuristic Bot 与 random uniform」差值，输出 `formations_top200_v2.json`，每局实测参照分为：
+
+| 指标 | 值 |
+|---|---|
+| 总评估局数 | 400 × 100 = 40,000 局 |
+| Top-200 平均 fitness | **54.46** |
+| 与 v1（20 局/eval）对比 | v1 fit_mean=10.86 — v2 fit_mean=54.46（2× evaluator 收敛） |
+| 差异化比率（双向 fitness 差） | 全部 50 组 rank 一致（稳定性验证通过） |
+
+备注：目标「高胜率布阵」以规则基线自打为参照，非 vs 训练行棋模型（行棋模型未达强度）。
