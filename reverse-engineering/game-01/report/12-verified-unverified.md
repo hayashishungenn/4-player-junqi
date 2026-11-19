@@ -91,4 +91,4 @@
 
 - `rea analyze pikafish.exe`：`ev_a16b9943…957b3`，2,924 过程 / 1,740 字符串。
 - `rea search pikafish.exe`：`ev_0bfa648c…c00d8`，90 条匹配。
-- `UnityPlayer.dll`：28 MB，默认 330 秒 Ghidra 启动超时；已提高超时重试，结果单独记录。
+- `UnityPlayer.dll`：28 MB，默认 330 秒 Ghidra 启动超时；提高超时的重试被中断，未完成。

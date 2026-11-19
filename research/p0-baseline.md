@@ -28,7 +28,7 @@
 | JDK | Temurin 21（系统）+ Temurin 25.0.5（`D:\tools\jdk-25.0.5+8`，Ghidra 12.2 要求） |
 | JADX | 未配置（无 APK，不影响本对象） |
 | ADB / MuMu | ADB 37.0.1 正常；MuMu 可启动，但对象为 Windows 构建 |
-| 已执行 | `rea analyze pikafish.exe` 成功（2,924 过程 / 1,740 字符串）；`rea search` 命中 NNUE/Stockfish/TranspositionTable；`UnityPlayer.dll` 28 MB 首次 330s 超时，已提高超时重试 |
+| 已执行 | `rea analyze pikafish.exe` 成功（2,924 过程 / 1,740 字符串）；`rea search` 命中 NNUE/Stockfish/TranspositionTable；`UnityPlayer.dll` 28 MB 首次 330s 超时；提高超时的重试被中断，尚未完成 |
 | 补充证据 | `reverse-engineering/evidence/game-01/rea-*.txt`、`rea-evidence-summary.md` |
 
 ## 3. 四个 GitHub 仓库
