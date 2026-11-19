@@ -38,7 +38,11 @@ def play_episode(model, heuristic, max_steps: int = 240):
 
 def main():
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 32
-    ckpt = HERE / "junqi_rtx5070ti_latest.pt"
+    ckpt_arg = sys.argv[2] if len(sys.argv) > 2 else str(HERE / "junqi_rtx5070ti_latest.pt")
+    ckpt = Path(ckpt_arg)
+    if not ckpt.exists():
+        print(f"checkpoint 不存在: {ckpt}")
+        return
     model = T.JunqiActorCritic(hidden_dim=160, num_blocks=8).cuda().eval()
     model.load_state_dict(torch.load(ckpt, map_location="cuda"))
     heuristic = T.HeuristicBotWrapper().cuda().eval()
