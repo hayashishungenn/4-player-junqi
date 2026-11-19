@@ -50,7 +50,8 @@
 
 ## P9 神经网络训练升级
 
-- GPU：RTX 5070 Ti Laptop 12GB（compute cap 12.0，driver 621.24）。CUDA 版 torch wheel（cu128，2.75GB）因代理不稳定下载受阻，多进程并发写损坏后已单进程重下（进行中）。CPU 版 torch 2.15.0 已验证可训练。
+- GPU（已验证）：RTX 5070 Ti Laptop 12GB（compute cap 12.0，driver 621.24）。CUDA wheel（torch 2.10.0+cu128，2.75GB）经单进程 curl 完整下载安装；`torch.cuda.is_available()=True`、GPU 矩阵运算正常。真实 GPU 自我对弈训练 8 局 alliance 成功（63 秒，loss -0.95→+0.07 小样本波动），实验参数记录 device=cuda / gpu=RTX 5070 Ti / torch 2.10.0+cu128 / seed 正确。
+- GPU 基准（Commit `0383c6e`，`benchmark_gpu.py`）：小模型（160 节点 / hidden 128 / 256 动作）训练 step CPU 2.91ms vs CUDA 3.91ms（**GPU 反而慢 0.75x**，kernel 启动开销主导），峰值显存 21.8MB。诚实结论：该规模网络上 GPU 无吞吐优势；更大规模需进一步评测。未夸大 GPU 收益。
 - Champion/Challenger（Commit `9aee399`）：`neural-bot/model_registry.py` 版本化快照（版本目录 + 权重 sha256 + meta），历史模型不可覆盖；晋级门槛 `is_significant`（样本≥40、胜率≥0.55、Wilson 下界≥0.50）才允许 promote，记录评测结果/晋级原因/Git Commit。测试 `test_model_registry.py`（3 项）全通过。
 - 评测闭环（Commit `301c923`）：`neural-bot/evaluate_champion.py` 让两个权重在自对弈环境对打，产出 `challenger_win_rate` 与 Wilson `challenger_ci_low`，可直接喂给 `is_significant`。实测同权重 6 局 alliance 全和棋 → `is_significant` 以「样本不足 6<40」正确拒绝晋级，闭环可用。
 - 训练器（Commit `e7a97b2`）：`--seed` 可复现（random/torch/cuda 全种子），每局记录含 seed，汇总含完整实验参数与设备（seed/modes/hidden/lr/temperature/discount/epochs/device/cuda/torch_version/gpu_name）。实测 2 局验证 seed=99 正确写入。
