@@ -1,6 +1,6 @@
 # 四国军棋 AI 陪练与复盘系统
 
-日期：2026-11-19。主工程固定为 MIT 许可的 `BitByBitG/siguo-junqi`（v2.12.2），在其现有架构上做最小必要修改。本目录为外层档案仓库；主工程代码位于 `workspace/siguo-junqi`（独立 git，已排除大文件与依赖目录）。
+日期：2026-11-19。主工程固定为 MIT 许可的 `BitByBitG/siguo-junqi`（v2.12.2），在其现有架构上做最小必要修改。本仓库同时包含研究档案与可运行代码：`code/siguo-junqi/` 为随本仓库交付的主工程快照（保留 MIT 许可与署名，已排除依赖目录、模型权重与账号数据）；本地开发目录为 `workspace/siguo-junqi`（独立 git）。运行方式见 `code/siguo-junqi/README.md`。
 
 ## 实现内容
 
@@ -24,7 +24,7 @@
 - `research/ai-algorithm.md`：AI 算法说明；`research/evaluation-report.md`：测试与棋力评测；`research/training-report.md`：自我对弈训练执行报告
 - `research/p0-baseline.md`：基线与既有失败测试
 
-主工程新增/修改（`workspace/siguo-junqi`）：
+主工程新增/修改（仓库内 `code/siguo-junqi/`，本地开发目录 `workspace/siguo-junqi`）：
 - `bots/engine/analysis.js`：逐手评分引擎（P3）
 - `bots/engine/replay-analysis.js`：复盘分析器（P4）
 - `bots/engine/difficulty.js`：多档难度（P2）
