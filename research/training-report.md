@@ -119,6 +119,7 @@ python self_play.py --games 6 --device cpu --modes alliance \
 | Pool≥12 | self-play 池（pool=12） | 150×64 / 64 | 3.82 GB | **10.0%（argmax 3/30）** |
 | Pool≥12 | self-play 池（pool=12） | 200×64 / 64 | 3.42 GB | 10.0%（argmax argmax + ） |
 | Pool≥17 | self-play 池（pool=17） | 300×64 / 256 | 5.30 GB | **0.0%**（30/30 平局，argmax） |
+| 最新（pool=15 best 150-Iter 落盘） | self-play 池 | 150×64 / 64 | 4.38 GB | **6.0%**（6/100 argmax, 94 平局） |
 
 **胜率非单调：200 迭代时 22.5%，随后继续训练反而坍缩到 0%**（300 iter Pool=17 30/30 平）。说明探索塌陷信号（贪婪 argmax 选无吃子平局）仍是局所最大值，训练继续却无法推它跨越。
 
