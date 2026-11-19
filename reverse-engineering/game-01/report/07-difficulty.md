@@ -11,7 +11,7 @@
 
 | 档位 | 代码英文名 | ELO | 主配置 | 深/随机 | 前 3 步特殊配置 |
 |---:|---|---:|---|---|---|
-| 0 | Newcomer | 100 | Native_Easy depth 0 → Native_Easy depth 2 | 0 / 1 | ElephantEyes depth 2 + 开局库 |
+| 0 | Newcomer | 100 | Native_Easy 深度 0 与深度 2 交替（StepBasedNumbers=[1,1]） | 0/2 / 1 | ElephantEyes depth 2 + 开局库（StepRange 0–3） |
 | 1 | Beginner | 200 | Native_Medium depth 2 | 2 / 1 | ElephantEyes depth 2 + 开局库 |
 | 2 | Novice | 400 | ElephantEyes depth 1 | 1 / 1 | — |
 | 3 | Apprentice | 600 | Pikafish depth 1 或 2，或 ElephantEyes 2（三套随机抽一） | 1–2 / 3 | — |
