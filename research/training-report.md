@@ -209,7 +209,9 @@ python self_play.py --games 6 --device cpu --modes alliance \
 
 | Iter | 40 局胜率 | 100 局胜率 | 表现 |
 |---|---|---|---|
-| iter160 | 12.5% (5/40) | - | pool 初期 plateau |
+| iter448 | 7.5% (3/40 loss=0) | - | Pentium 卷 check也落到 near-baseline 水平（远低 peak） |
+| **iter248** | **25.0% (10/40)** | **24.0% (24/100)** | **Iter248 峰值稳定复现** |
+| **iter240** | **26.0% (13/50 # 13W 0L 37D)** | - | **池20四十一帧热身，最优 checkpoint 之一** |
 | iter192 | 5.0% (2/40) | - | pool 饱和低谷 |
 | iter200 | 10.0% (4/40) | - | 稳定 10% 基线 |
 | iter232 | 10.0% (4/40) | - | 振荡 |
