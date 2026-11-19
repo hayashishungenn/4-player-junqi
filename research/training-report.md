@@ -92,13 +92,14 @@ python self_play.py --games 6 --device cpu --modes alliance \
 | 早期 | 规则基线（pool=1） | 80×128 / 128 | 1.82 GB | 5.0%（argmax 2/40） |
 | Pool≥10 | self-play 池（pool=10） | 120×128 / 128 | 3.38 GB | 10.0%（4/40） |
 | Pool≥20 | self-play 池（pool=20） | 200×128 / 256 | 6.08 GB | **22.5%**（9/40） |
-| Pool≥15 | self-play 池（pool=15） | 150×128 / 128 | 3.8 GB | 10.0%（argmax 3/30） |
+| Pool≥15 | self-play 池（pool=15） | 200×64 / 64 | 3.42 GB | 10.0%（3/30） |
+| Pool≥12 | self-play 池（pool=12） | 150×64 / 64 | 3.82 GB | **10.0%（argmax 3/30）** |
+| Pool≥12 | self-play 池（pool=12） | 200×64 / 64 | 3.42 GB | 10.0%（argmax argmax + ） |
+| Pool≥17 | self-play 池（pool=17） | 300×64 / 256 | 5.30 GB | **0.0%**（30/30 平局，argmax） |
 
-密集获取奖励 ×10 修复（`val_map` ×10）：纯和局塌陷后 Rew 转正（+0.005~+0.07/步段）。最大 checkpoint 为 Pool=20 Iter=200，胜率 22.5%（9/40 argmax）。
+**胜率非单调：200 迭代时 22.5%，随后继续训练反而坍缩到 0%**（300 iter Pool=17 30/30 平）。说明探索塌陷信号（贪婪 argmax 选无吃子平局）仍是局所最大值，训练继续却无法推它跨越。
 
-密集获取奖励 \u00d710 不单独胜出——两次要联动：
-1. Multi-snapshot opponent pool（`opponent_pool_enabled=True`）：胜率 5%→10→22.5%，显式可复现
-2. \u00d710 密集 reward：使模型从纯 draw 塌陷逃脱
+密集获取奖励修复 (×10 + opponent_pool_enabled=True) 之前 Rew 持续为负；之后 Rew 普遍转正 (+0.01~+0.07)，验证 commander+司令/军长/主力 这些 sparse 奖励已被模型吸收到模型权重，但 win-rate 起伏说明价值函数脆弱。
 
 ### 5.4 环境约束（决定为何 5×10^7 步不可及）
 
