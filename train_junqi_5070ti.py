@@ -759,7 +759,10 @@ class HighThroughputSelfPlayTrainer:
         self.buf_dones = torch.zeros((T, N), dtype=torch.float32, device=self.device)
 
     def _push_snapshot(self):
-        snap = copy.deepcopy(self.policy).eval()
+        # 用 state_dict 克隆重建快照模型，避免整模型 deepcopy 同时双份驻留显存（+3~4GB）
+        snap = JunqiActorCritic(hidden_dim=160, num_blocks=8).to(self.device)
+        snap.load_state_dict(copy.deepcopy(self.policy.state_dict()))
+        snap.eval()
         for p in snap.parameters():
             p.requires_grad_(False)
         if len(self.opponent_pool) >= self.cfg.pool_max_size:
