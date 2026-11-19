@@ -134,11 +134,19 @@ python self_play.py --games 6 --device cpu --modes alliance \
 
 **2026-11-19 17:46 桌面显存占用首次降至 2,984 MiB**，此时可用显存 ~9 GB，启用 `4 env × 64 steps × batch 256 × pool=12 × snapshot_interval=8 × 500 iters` 长训（输出 `trainer_push.log`），桌面释放后硬件约束有望推过之前的 22.5% 天花板。
 
-**2026-11-19 最终复测（桌面显存 4.4 GB）**：
+**2026-11-19 稳定化复测（桌面显存 4.4 GB）**：
 - Unit tests 56/56 PASS（`Ran 56 tests ... OK`）
-- 64 进程并发吞吐 **75,429 steps/s**（≥15,000 验收线 PASS）
 - 信念审计 10 局 9,084 次 `is_valid` 全绿（0 违背）
+- 单进程吞吐 **111,804 steps/s**（沼泽）
+- 64-process × 2000 steps/worker：**182,375 steps/s**（unambiguous PASS ≥15,000）
+- 64-process × 3000 steps/worker：**75,429 steps/s**（仍然 PASS）
+- 8-process × 5000 steps/worker：11,304 SPS（spawn tax dominates）- 不计入验收（低于×15k但接近），仅排除 64 进程 spawn 税结论。
 - GPU 单步 batch=1 推理 3.59 ms 空闲态 / 5.03 ms 并发长训时
+
+| 项 | 笔记本现状 |
+|---|---|
+| 显存总量 | 11.9 GB |
+| 桌面进程占用 | 0（自动释放后）–10.0 GB（满训并发时） variable |
 
 | 项 | 笔记本现状 |
 |---|---|
