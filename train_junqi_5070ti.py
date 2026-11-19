@@ -410,7 +410,7 @@ class JunqiSelfPlayEnv:
             done, winner_team = True, 1
         elif not team1_alive:
             done, winner_team = True, 0
-        elif self.step_count >= self.max_steps or self.no_capture_steps >= 80:
+        elif self.step_count >= self.max_steps or self.no_capture_steps >= 120:
             done, winner_team = True, -1
 
         if done and winner_team != -1:
@@ -701,6 +701,7 @@ class GPUTrainConfig:
     vf_coef: float = 0.5
     max_grad_norm: float = 0.5
     pool_max_size: int = 20
+    opponent_pool_enabled: bool = False  # 阶段三：固定对手 = 启发式规则基线
     snapshot_interval: int = 10
 
 
@@ -826,7 +827,7 @@ class HighThroughputSelfPlayTrainer:
         T, N = self.cfg.steps_per_env, self.cfg.num_envs
         env_cursors = np.zeros(N, dtype=np.int32)
         pending_step = [None] * N
-        pool_size = len(self.opponent_pool)
+        pool_size = len(self.opponent_pool) if self.cfg.opponent_pool_enabled else 1
 
         t0 = time.perf_counter()
         total_env_ticks = 0
@@ -942,7 +943,7 @@ class HighThroughputSelfPlayTrainer:
         try:
             for it in range(1, self.cfg.total_iterations + 1):
                 progress = it / self.cfg.total_iterations
-                shaping_w = max(0.1, 1.0 - 0.9 * progress)
+                shaping_w = max(0.3, 1.0 - 0.4 * progress)
                 ent_coef = self.cfg.ent_coef_start + (self.cfg.ent_coef_end - self.cfg.ent_coef_start) * progress
 
                 sps, mean_rew = self.collect_rollout(shaping_w)
