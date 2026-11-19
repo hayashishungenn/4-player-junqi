@@ -124,7 +124,9 @@ python self_play.py --games 6 --device cpu --modes alliance \
 
 密集获取奖励修复 (×10 + opponent_pool_enabled=True) 之前 Rew 持续为负；之后 Rew 普遍转正 (+0.01~+0.07)，验证 commander+司令/军长/主力 这些 sparse 奖励已被模型吸收到模型权重，但 win-rate 起伏说明价值函数脆弱。
 
-### 5.4 环境约束（决定为何 5×10^7 步不可及）
+### 5.4 工作态验证流程（端到端复测）
+
+**2026-11-19 17:46 桌面显存占用首次降至 2,984 MiB**，此时可用显存 ~9 GB，启用 `4 env × 64 steps × batch 256 × pool=12 × snapshot_interval=8 × 500 iters` 长训（输出 `trainer_push.log`），桌面释放后硬件约束有望推过之前的 22.5% 天花板。完成后更新本文 P5.3 表格。
 
 | 项 | 笔记本现状 |
 |---|---|
