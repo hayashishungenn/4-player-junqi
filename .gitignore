@@ -1,0 +1,15 @@
+# 反编译产物与大型二进制不入库
+reverse-engineering/game-01/static-analysis/decompiled/
+reverse-engineering/game-01/original/
+reverse-engineering/game-02/original/
+
+# 运行/构建产物
+bin/
+obj/
+*.log
+*.tmp
+
+# 系统文件
+Thumbs.db
+desktop.ini
+.DS_Store

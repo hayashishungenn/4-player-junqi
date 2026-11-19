@@ -1,0 +1,6 @@
+# SHA-256 清单（生成日期 2026-11-19）
+fdff63249900060815bb3832133007d880f2116f2ba00ea725961ad981e69ca8 *D:/SteamLibrary/steamapps/common/Just Xiangqi/JustXiangqi.exe
+a0edd987a34910df8ff0589e39848a92dc61a133cedc5eaa7acf938321e5825e *D:/SteamLibrary/steamapps/common/Just Xiangqi/JustXiangqi_Data/Managed/Assembly-CSharp.dll
+8fedd65c00d15b20265148cd102856ce20d4cdb9e9fdef93553ca74433845961 *D:/SteamLibrary/steamapps/common/Just Xiangqi/JustXiangqi_Data/StreamingAssets/AI/PikaFish/pikafish.exe
+53f62e990716187e59510898749cf59bcb680c4da0b80c23005cec3eda321cc6 *D:/SteamLibrary/steamapps/common/Just Xiangqi/JustXiangqi_Data/StreamingAssets/AI/PikaFish/pikafish.nnue
+2021fcb1bbae5bad3c8e0107efd413ff9b09bd23ec2656ef9f3c61a22e7f6e2e *D:/SteamLibrary/steamapps/common/Just Xiangqi/JustXiangqi_Data/StreamingAssets/Classic/ClassicMatch_1.game

@@ -1,0 +1,6 @@
+# SHA-256 清单（生成日期 2026-11-19）
+c78a60e160edce40416871d6b4bd98228ded03fd07be55be95356e165c8b3c69 *D:/SteamLibrary/steamapps/common/Just Go/gtp_logs/20260116-102532-923AB239.log
+e5db543841ac0f38d3456a43b38f00aa89aa48c05324067fac9a723c01470461 *D:/SteamLibrary/steamapps/common/Just Go/gtp_logs/20260116-102532-DD5B56EE.log
+2ae946f060e0a8a70784526bd31934b071db4c7213479b98eeee65ccd899bc1a *C:/Users/Hayas/AppData/LocalLow/Studio Amateur/JustGo/RecentSGFs/sgf_1768530733.sgf
+a9839ac37100bc3e1f521b5f03303ddbdd3b7953340c6dd61462f3dc95d3b559 *C:/Users/Hayas/AppData/LocalLow/Studio Amateur/JustGo/RecentGames/match_1768530733.sav
+81513ad91ce0050b9553159544dee33b7b8bad40399cf03a5c1e7dbe796f1dcd *C:/Users/Hayas/AppData/LocalLow/Studio Amateur/JustGo/Player.log
