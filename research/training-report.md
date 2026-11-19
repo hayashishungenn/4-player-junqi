@@ -61,6 +61,10 @@ python self_play.py --games 6 --device cpu --modes alliance \
 - 训练记录写入临时目录；若需长期留存，应配置固定 `--record` 路径并纳入运维（不入库）。
 - 8env×128steps×BF16×80 迭代的真实对战收益：胜率 5/30（16.7%），VF 从 0.71 降到 0.0017，PG 降到 0.03 —— 损失收敛路径正常，但训练量与 1×10^7 目标相差五到六个数量级，未突破 65% 验收线。
 
+### 5.5 checkpoint 选择与保存策略缺陷
+
+`train_junqi_5070ti.py` 每次保存 `junqi_rtx5070ti_latest.pt` 都是**覆盖式**写入，不区分好的坏的。胜率非单调（5%→10%→22.5%→0%）期间最好的 20 迭代 pool=20 checkpoint 已被后续训练覆盖。改进方向：在 `_push_snapshot` 中按评测胜率持久保存 `best_checkpoint.pt`，或携带 iteration 号到文件名（`.iter{it}.pt`）。**本报告未实施该改进**（不修改用户脚本结构，仅记录缺陷）。
+
 ## 5. GPU/CUDA 现实验证（2026-11-19 补记，用户自有 `train_junqi_5070ti.py`）
 
 实验平台：RTX 5070 Ti Laptop（11.9 GB）/ BF16 支持 / CUDA 版 PyTorch / 桌面进程占 ≈3.5 GB 显存。
