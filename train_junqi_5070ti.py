@@ -952,6 +952,7 @@ class HighThroughputSelfPlayTrainer:
 
                 if it % self.cfg.snapshot_interval == 0:
                     self._push_snapshot()
+                    torch.save(self.policy.state_dict(), f"junqi_iter{it:03d}.pt")
                     torch.save(self.policy.state_dict(), "junqi_rtx5070ti_latest.pt")
 
                 if it % 2 == 0 or it == 1:
