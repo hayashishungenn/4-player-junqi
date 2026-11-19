@@ -141,7 +141,7 @@ python self_play.py --games 6 --device cpu --modes alliance \
 - 64-process × 2000 steps/worker：**182,375 steps/s**（unambiguous PASS ≥15,000）
 - 64-process × 3000 steps/worker：**75,429 steps/s**（仍然 PASS）
 - 8-process × 5000 steps/worker：11,304 SPS（spawn tax dominates）- 不计入验收（低于×15k但接近），仅排除 64 进程 spawn 税结论。
-- GPU 单步 batch=1 推理 3.59 ms 空闲态 / 5.03 ms 并发长训时
+- GPU 单步 batch=1 推理：空闲态 **3.53–3.59 ms**（先前态） / 并发长训时 **5.24–5.51 ms**（median 5.24, mean 5.29）
 
 | 项 | 笔记本现状 |
 |---|---|
