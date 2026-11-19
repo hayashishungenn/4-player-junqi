@@ -66,7 +66,6 @@ candidate_ids[4]: ghidra,hopper,ida,kuna
 本会话工具清单中没有 `mcp__rea__*` 工具，REA 未以 MCP 方式连接。
 
 ### REA 发布面审计（可执行部分）
-
 对三个关键 PE 产物执行 `rea audit-release-exposure`，均成功返回 Evidence：
 
 | 产物 | evidence_id | 检查项 |
@@ -84,6 +83,26 @@ candidate_ids[4]: ghidra,hopper,ida,kuna
 - `Assembly-CSharp.dll` 泄漏原始工程名：`C:\Unity\ChineseChess_Windows\Temp\Assembly-CSharp.pdb`。
 - `native.debug_companions` 均为 `not_observed`（未随包附带 PDB）。
 - `android.manifest` 为 `not_assessed`（非 APK，符合预期）。
+
+### Ghidra 深分析（REA analyze / search）
+
+工具链：Ghidra 12.2 + Temurin JDK 25.0.5。
+
+| 操作 | evidence_id / 结果 |
+|---|---|
+| `rea analyze pikafish.exe` | `ev_a16b99431fe74339b39318e46ccfd76b9573805b9ee3646d9adcf78879f957b3`；PE/x86_64，2,924 过程，1,740 字符串 |
+| `rea search pikafish.exe`（NNUE/UCI/Stockfish 正则） | `ev_0bfa648c37fb9310b793c446ee85717963efa54e540ded08fd3c28b74b6c00d8`；90 条匹配 |
+| `rea analyze UnityPlayer.dll` | 28 MB，默认 330 秒启动超时；提高 `REA_GHIDRA_STARTUP_TIMEOUT_MS` 后重试（结果见 `rea-analyze-unityplayer.txt`） |
+
+关键符号（Pikafish）：
+
+- `pikafish.nnue` @ `0x140136b80`、`EvalFile` @ `0x140136cf5`
+- `N9Stockfish18LazyNumaReplicatedINS_4Eval4NNUE7NetworkEEE` @ `0x140138e18`
+- `TranspositionTable::clear(ThreadPool&)` RTTI @ `0x14014a518`
+- `N9Stockfish6Search13SearchManagerE` @ `0x140149a96`
+- `setoption` @ `0x14014aaf2`、`info depth ` @ `0x14014b0e0`、` multipv ` @ `0x14014b10c`
+
+汇总见 `game-01/rea-evidence-summary.md`。
 
 ## Pikafish UCI 握手
 

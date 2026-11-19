@@ -13,3 +13,8 @@ obj/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# 克隆的参考/主工程仓库（各自独立 git）
+workspace/
+# 基线运行产生的临时数据
+research/baseline/runtime-data/

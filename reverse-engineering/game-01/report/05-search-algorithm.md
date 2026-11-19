@@ -95,3 +95,14 @@ PHASE_HASH → PHASE_GEN_CAP → PHASE_GOODCAP → PHASE_KILLER1 → PHASE_KILLE
 | 神经网络估值（C# 内） | 未发现；NNUE 在 Pikafish 内部 |
 | 终局数据库 | 未发现独立残局库；残局以题目列表 `Book/Endgames` 形式存在 |
 | 定式库 | 开局库承担该角色（两套：文本 + 内置二进制表） |
+
+## 6. REA / Ghidra 证据
+
+- `rea analyze`：`evidence_id=ev_a16b99431fe74339b39318e46ccfd76b9573805b9ee3646d9adcf78879f957b3`，2,924 过程 / 1,740 字符串。
+- 置换表：字符串 `...Stockfish18TranspositionTable5clearERNS2_10ThreadPoolE...` @ `0x14014a518`，证明存在 `TranspositionTable` 及 `clear(ThreadPool&)`。
+- 搜索管理：`N9Stockfish6Search13SearchManagerE` @ `0x140149a96`、`ISearchManager` @ `0x14014a1b8`、`NullSearchManager` @ `0x14014a218`。
+- 线程：`Stockfish6Thread` 构造相关 RTTI 符号（`0x140149db8` 起）。
+- UCI：`info depth ` @ `0x14014b0e0`、` multipv ` @ `0x14014b10c`。
+- 结论：Pikafish 为 Stockfish 系实现，具备置换表、线程池、搜索管理器与 MultiPV；与“PVS/迭代加深”判断一致。
+
+详见 `evidence/game-01/rea-evidence-summary.md`。

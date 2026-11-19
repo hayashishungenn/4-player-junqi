@@ -78,3 +78,17 @@
 | 三个 PE 产物可通过 REA 发布面审计 | `evidence/game-01/rea-audit-*.txt`，15 项检查 |
 | 产物残留 PDB 路径 | `native.pdb_path: exposed`；exe 指向 Unity 构建机，dll 指向 `ChineseChess_Windows` 工程 |
 | 未附带 PDB | `native.debug_companions: not_observed` |
+
+## 8. REA 深分析（Ghidra 12.2）
+
+| 结论 | Evidence |
+|---|---|
+| Pikafish 为 Stockfish 系实现 | `rea analyze` + `rea search`；`Stockfish::TranspositionTable`、`SearchManager`、`Thread`、`Eval::NNUE::Network` RTTI 符号 |
+| 使用 NNUE | `pikafish.nnue`、`EvalFile`、`NNUE evaluation` 字符串 |
+| 具备置换表 | `TranspositionTable::clear(ThreadPool&)` 符号、`Hash` 选项 |
+| 具备 MultiPV/Threads/Skill | ` multipv `、`setoption name Threads value`、`Skill Level` 字符串 |
+| 客户端只做协议解析 | UCI 字符串 + 客户端 `ProcessManager` 解析逻辑一致 |
+
+- `rea analyze pikafish.exe`：`ev_a16b9943…957b3`，2,924 过程 / 1,740 字符串。
+- `rea search pikafish.exe`：`ev_0bfa648c…c00d8`，90 条匹配。
+- `UnityPlayer.dll`：28 MB，默认 330 秒 Ghidra 启动超时；已提高超时重试，结果单独记录。

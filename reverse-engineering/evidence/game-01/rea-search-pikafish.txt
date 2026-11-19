@@ -1,0 +1,621 @@
+evidence_id: ev_0bfa648c37fb9310b793c446ee85717963efa54e540ded08fd3c28b74b6c00d8
+subject:
+  name: pikafish.exe
+  digest:
+    sha256: 8fedd65c00d15b20265148cd102856ce20d4cdb9e9fdef93553ca74433845961
+  local_path: "D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi_Data\\StreamingAssets\\AI\\PikaFish\\pikafish.exe"
+  format: pe
+  architecture: x86_64
+provider:
+  id: ghidra
+  name: Ghidra
+  version: "12.2"
+analysis_profile:
+  provider:
+    id: ghidra
+    name: Ghidra
+    version: "12.2"
+  parameters:
+    target_kind: executable
+    target_format: pe
+    executable_role: application
+    managed: false
+    native_aot_metadata:
+      contract_revision: rtr-9.1-x64-pe-read-only-v10
+      source_bytes: 134217728
+      work_units: 67108864
+      working_memory_bytes: 67108864
+      report_bytes: 4194304
+    architecture: x86_64
+    available_architectures[1]: x86_64
+    import_mode: ephemeral-source-immutable
+    pdb_observations: program-info-v5
+    annotation_policy: atomic-function-entry-metadata-v1
+    byte_search_boundary: contiguous-eligible-initialized-blocks-v1
+    load_image_observations: source-mappings-entry-context-relocation-symbol-v3
+    function_body_evidence: complete-inclusive-ranges-v1
+    function_references: complete-body-and-entry-reference-manager-v3
+    call_relationship_coverage: observed-call-inventory-and-discovery-v7
+    function_dossier_coverage: observed-facets-and-call-relationships-v1
+    native_value_flow_projection: accepted-runtime-budgets-v1
+    value_flow_effect_scope: pcode-load-store-explicit-v1
+    string_inventory_evidence: defined-data-coverage-v1
+    inventory_search_projection: provider-inventory-facts-v1
+    data_type_observations: bit-field-base-and-lookup-v1
+    location_resolution: explicit-address-exact-entry-symbol-first-v3
+    procedure_search: primary-and-exact-entry-symbol-names-v1
+    procedure_file_offset_resolution: address-first-unique-target-source-mapping-v2
+    instruction_flow_evidence: decoded-return-pcode-v1
+    instruction_status: unlisted-and-containing-code-data-v3
+    instruction_references: exact-address-incoming-without-synthetic-entry-v3
+    byte_search_coverage: separate-loaded-overlays-v1
+    function_boundary_observations: ghidra-function-boundary-limitations-v4
+    no_return_repair: disabled-windows-p0
+    process_launch: official-headless-script-v1
+    jump_table_evidence: typed-case-default-blocks-v1
+    decompiler_jump_loads: true
+    loader: auto-from-header
+    language_id: auto-from-header
+    compiler_spec_id: auto-default
+    analyzer_preset: ghidra-default
+    function_coordinate_context:
+      kind: native-function-coordinate-context-v1
+      selected_image: null
+      mapping_sha256: 55a7964dc0bcdf067484a281c658e6ca8457a49405e0ea9dbd080366ee4c3198
+  digest: 61223cbd1a45eab6222042d66b730813a4217b9c1e8b4e1d5da2f82f9d977e53
+predicate_type: rea.analysis
+operation: search_strings
+parameters:
+  pattern: NNUE|MultiPV|setoption|EvalFile|info depth|Stockfish|Skill Level
+  mode: regex
+  case_sensitive: false
+raw_result: null
+normalized_result[90]:
+  - address: 0x1401353b8
+    value: "setoption name Threads value "
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 30
+  - address: 0x1401353d6
+    value: "setoption name Hash value "
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 27
+  - address: 0x140136b80
+    value: pikafish.nnue
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 14
+  - address: 0x140136cf5
+    value: EvalFile
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 9
+  - address: 0x140136e40
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_0NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x140136ef8
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x140136fd0
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_1NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x140137088
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_1
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x140137160
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_2NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x140137218
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_2
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x1401372f0
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_3NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x1401373a8
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_3
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x140137480
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_4NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x140137538
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_4
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x140137610
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_5NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x1401376c8
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_5
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x1401377a0
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_6NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x14013788f
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_6
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x140137968
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_7NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x140137a5e
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_7
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x140137b38
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_8NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x140137bf0
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_8
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x140137cc8
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE3$_9NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x140137d80
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE3$_9
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 108
+  - address: 0x140137e58
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE4$_10NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 160
+  - address: 0x140137f2c
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE4$_10
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 109
+  - address: 0x140138008
+    value: NSt3__110__function6__funcIZN9Stockfish6EngineC1ENS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEEE4$_11NS8_ISC_EEFSB_RKNS2_6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 160
+  - address: 0x1401380c0
+    value: ZN9Stockfish6EngineC1ENSt3__18optionalINS1_12basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEEEE4$_11
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 109
+  - address: 0x140138162
+    value: "NNUE evaluation        "
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 24
+  - address: 0x1401381af
+    value: " [with scaled NNUE, ...]"
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 25
+  - address: 0x140138db8
+    value: N9Stockfish18NumaReplicatedBaseE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 33
+  - address: 0x140138e18
+    value: N9Stockfish18LazyNumaReplicatedINS_4Eval4NNUE7NetworkEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 57
+  - address: 0x1401390e0
+    value: N9Stockfish12_GLOBAL__N_13TieE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 31
+  - address: 0x1401396e9
+    value: "The UCI option EvalFile might need to specify the full path, including the directory name, to the network file."
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 112
+  - address: 0x1401397f8
+    value: "info string NNUE evaluation using "
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 35
+  - address: 0x140139a22
+    value: " NNUE derived piece values:\n"
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 29
+  - address: 0x140139a3f
+    value: " NNUE network contributions "
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 29
+  - address: 0x140149a48
+    value: Skill Level
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 12
+  - address: 0x140149a6e
+    value: MultiPV
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 8
+  - address: 0x140149a96
+    value: N9Stockfish6Search13SearchManagerE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 35
+  - address: 0x140149b73
+    value: N9Stockfish6ThreadE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 20
+  - address: 0x140149bf8
+    value: NSt3__110__function6__funcINS_6__bindIMN9Stockfish6ThreadEFvvEJPS4_EEENS_9allocatorIS8_EEFvvEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 96
+  - address: 0x140149c70
+    value: NSt3__16__bindIMN9Stockfish6ThreadEFvvEJPS2_EEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 48
+  - address: 0x140149ca0
+    value: NSt3__118__weak_result_typeIMN9Stockfish6ThreadEFvvEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 55
+  - address: 0x140149cd7
+    value: NSt3__133__unary_function_keep_layout_baseIPN9Stockfish6ThreadEvEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 67
+  - address: 0x140149db8
+    value: NSt3__110__function6__funcIZN9Stockfish6ThreadC1ERNS2_6Search11SharedStateENS_10unique_ptrINS4_14ISearchManagerENS_14default_deleteIS8_EEEEyNS2_30OptionalThreadToNumaNodeBinderEE3$_0NS_9allocatorISD_EEFvvEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 208
+  - address: 0x140149ea0
+    value: ZN9Stockfish6ThreadC1ERNS_6Search11SharedStateENSt3__110unique_ptrINS1_14ISearchManagerENS4_14default_deleteIS6_EEEEyNS_30OptionalThreadToNumaNodeBinderEE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 159
+  - address: 0x140149fa8
+    value: NSt3__110__function6__funcIZN9Stockfish6Thread15start_searchingEvE3$_0NS_9allocatorIS4_EEFvvEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 96
+  - address: 0x14014a020
+    value: ZN9Stockfish6Thread15start_searchingEvE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 44
+  - address: 0x14014a0b8
+    value: NSt3__110__function6__funcIZN9Stockfish6Thread12clear_workerEvE3$_0NS_9allocatorIS4_EEFvvEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 93
+  - address: 0x14014a130
+    value: ZN9Stockfish6Thread12clear_workerEvE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 41
+  - address: 0x14014a1b8
+    value: N9Stockfish6Search14ISearchManagerE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 36
+  - address: 0x14014a218
+    value: N9Stockfish6Search17NullSearchManagerE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 39
+  - address: 0x14014a2b0
+    value: NSt3__110__function6__funcIZN9Stockfish10ThreadPool14start_thinkingERNS2_8PositionERNS_10unique_ptrINS_5dequeINS2_9StateInfoENS_9allocatorIS8_EEEENS_14default_deleteISB_EEEENS2_6Search10LimitsTypeEE3$_0NS9_ISI_EEFvvEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 219
+  - address: 0x14014a3a8
+    value: ZN9Stockfish10ThreadPool14start_thinkingERNS_8PositionERNSt3__110unique_ptrINS3_5dequeINS_9StateInfoENS3_9allocatorIS6_EEEENS3_14default_deleteIS9_EEEENS_6Search10LimitsTypeEE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 180
+  - address: 0x14014a518
+    value: NSt3__110__function6__funcIZN9Stockfish18TranspositionTable5clearERNS2_10ThreadPoolEE3$_0NS_9allocatorIS6_EEFvvEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 115
+  - address: 0x14014a5d8
+    value: ZN9Stockfish18TranspositionTable5clearERNS_10ThreadPoolEE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 62
+  - address: 0x14014a628
+    value: NSt3__110__function6__baseIFNS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEEEERKN9Stockfish6OptionEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 126
+  - address: 0x14014aaf2
+    value: setoption
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 10
+  - address: 0x14014b0e0
+    value: "info depth "
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 12
+  - address: 0x14014b10c
+    value: " multipv "
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 10
+  - address: 0x14014dbf8
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngineC1EiPPcE3$_0NS_9allocatorIS6_EEFvNS_8optionalINS_12basic_stringIcNS_11char_traitsIcEENS7_IcEEEEEEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 150
+  - address: 0x14014dd20
+    value: ZN9Stockfish9UCIEngineC1EiPPcE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 35
+  - address: 0x14014ddb0
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_0NS_9allocatorIS4_EEFvRKNS2_6Search13InfoIterationEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 140
+  - address: 0x14014de3c
+    value: NSt3__110__function6__baseIFvRKN9Stockfish6Search13InfoIterationEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 69
+  - address: 0x14014deb0
+    value: ZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 60
+  - address: 0x14014df58
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_1NS_9allocatorIS4_EEFvRKNS2_6Search9InfoShortEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 135
+  - address: 0x14014dfdf
+    value: NSt3__110__function6__baseIFvRKN9Stockfish6Search9InfoShortEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 64
+  - address: 0x14014e048
+    value: ZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_1
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 60
+  - address: 0x14014e0f0
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_2NS_9allocatorIS4_EEFvRKNS2_6Search8InfoFullEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 134
+  - address: 0x14014e176
+    value: NSt3__110__function6__baseIFvRKN9Stockfish6Search8InfoFullEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 63
+  - address: 0x14014e1e0
+    value: ZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_2
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 60
+  - address: 0x14014e288
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_3NS_9allocatorIS4_EEFvNS_17basic_string_viewIcNS_11char_traitsIcEEEESA_EEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 160
+  - address: 0x14014e3a8
+    value: ZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_3
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 60
+  - address: 0x14014e450
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_4NS_9allocatorIS4_EEFvNS_17basic_string_viewIcNS_11char_traitsIcEEEEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 157
+  - address: 0x14014e568
+    value: ZN9Stockfish9UCIEngine28init_search_update_listenersEvE3$_4
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 60
+  - address: 0x14014e618
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine5benchERNS_13basic_istreamIcNS_11char_traitsIcEEEEE3$_0NS_9allocatorIS9_EEFvRKNS2_6Search8InfoFullEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 152
+  - address: 0x14014e6c8
+    value: ZN9Stockfish9UCIEngine5benchERNSt3__113basic_istreamIcNS1_11char_traitsIcEEEEE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 83
+  - address: 0x14014e790
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine5benchERNS_13basic_istreamIcNS_11char_traitsIcEEEEE3$_1NS_9allocatorIS9_EEFvRKNS2_6Search8InfoFullEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 152
+  - address: 0x14014e840
+    value: ZN9Stockfish9UCIEngine5benchERNSt3__113basic_istreamIcNS1_11char_traitsIcEEEEE3$_1
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 83
+  - address: 0x14014e900
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine9benchmarkERNS_13basic_istreamIcNS_11char_traitsIcEEEEE3$_4NS_9allocatorIS9_EEFvRKNS2_6Search8InfoFullEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 156
+  - address: 0x14014e9b8
+    value: ZN9Stockfish9UCIEngine9benchmarkERNSt3__113basic_istreamIcNS1_11char_traitsIcEEEEE3$_4
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 87
+  - address: 0x14014ea78
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine9benchmarkERNS_13basic_istreamIcNS_11char_traitsIcEEEEE3$_0NS_9allocatorIS9_EEFvRKNS2_6Search13InfoIterationEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 162
+  - address: 0x14014eb38
+    value: ZN9Stockfish9UCIEngine9benchmarkERNSt3__113basic_istreamIcNS1_11char_traitsIcEEEEE3$_0
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 87
+  - address: 0x14014ebf8
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine9benchmarkERNS_13basic_istreamIcNS_11char_traitsIcEEEEE3$_1NS_9allocatorIS9_EEFvRKNS2_6Search9InfoShortEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 157
+  - address: 0x14014ecb0
+    value: ZN9Stockfish9UCIEngine9benchmarkERNSt3__113basic_istreamIcNS1_11char_traitsIcEEEEE3$_1
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 87
+  - address: 0x14014ed70
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine9benchmarkERNS_13basic_istreamIcNS_11char_traitsIcEEEEE3$_2NS_9allocatorIS9_EEFvNS_17basic_string_viewIcS6_EESD_EEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 165
+  - address: 0x14014ee30
+    value: ZN9Stockfish9UCIEngine9benchmarkERNSt3__113basic_istreamIcNS1_11char_traitsIcEEEEE3$_2
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 87
+  - address: 0x14014eef0
+    value: NSt3__110__function6__funcIZN9Stockfish9UCIEngine9benchmarkERNS_13basic_istreamIcNS_11char_traitsIcEEEEE3$_3NS_9allocatorIS9_EEFvNS_17basic_string_viewIcS6_EEEEE
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 162
+  - address: 0x14014efb0
+    value: ZN9Stockfish9UCIEngine9benchmarkERNSt3__113basic_istreamIcNS1_11char_traitsIcEEEEE3$_3
+    string:
+      encoding: US-ASCII
+      termination: present_or_not_required
+      byte_length: 88
+confidence: observed
+authority: shipped-artifact
+environment: null
+limitations[11]: The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.,"Ghidra Program checkpoint mode is disabled: closing discards metadata edits; original executable bytes are unchanged. For stock ELF/PE/Mach-O on Linux/macOS, set REA_GHIDRA_CHECKPOINT_DIR to a private absolute directory before starting REA (restart MCP after changing its startup environment).",Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.,"Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.","Only Ghidra-defined string Data is observed; packed or undefined string bytes may be absent. Completeness applies to that inventory, and an empty search does not establish that text is absent from the artifact. If an address is known, use read_bytes and xrefs to inspect bytes and references.",Regex mode uses Java Pattern semantics. Matcher or compiler stack exhaustion returns a resource constraint without closing the session; literal mode avoids regex recursion and returns complete matching values.,"Windows Ghidra P0 accepts native x86, x86-64, ARMNT (Thumb-2) and ARM64 PE applications and DLLs, DOS MZ images, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.",The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.,"Windows sessions require the matching packaged Windows x64 native addon, local NTFS/ReFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.","The Ghidra Program references PDB  (GUID 3c91625f-e520-60d1-4c4c-44205044422e, age (hex) 1, signature unknown, version RSDS); Ghidra reports load state unknown. Original names and types may be missing; an empty name search does not prove a procedure is absent. Use list_procedures and address-based analysis to inspect recovered functions. REA does not admit a caller-selected PDB companion.",This session uses Ghidra 12.2. The bridge is verified against 12.1.4; other 12.x (>=12.1) builds are accepted and the observed version is reported.
+relationship_coverage: null
+locations: []
+evidence_links: []
+caller_input_path: "D:/SteamLibrary/steamapps/common/Just Xiangqi/JustXiangqi_Data/StreamingAssets/AI/PikaFish/pikafish.exe"

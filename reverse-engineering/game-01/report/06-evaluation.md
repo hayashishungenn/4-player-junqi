@@ -58,3 +58,12 @@ return (pieceColor == Red) ? num2 - num3 : num3 - num2;
 - SharpElephantEyes 的具体特征权重表未展开为可读数据；只能确认存在预计算评估表与知识开关。
 - Pikafish NNUE 的网络架构、输入特征、训练集：包内无元数据，标记未知。
 - 子力价值 2500/23/23/108/233/101/44 的来源与调参过程未知。
+
+## 8. REA / Ghidra 证据
+
+- 网络文件：`pikafish.nnue` @ `0x140136b80`；`EvalFile` @ `0x140136cf5`。
+- NNUE 类：`N9Stockfish18LazyNumaReplicatedINS_4Eval4NNUE7NetworkEEE` @ `0x140138e18`。
+- 运行提示：`NNUE evaluation` @ `0x140138162`、`info string NNUE evaluation using ` @ `0x1401397f8`。
+- 与游戏侧 `pikafish.nnue`（45.5 MB）文件、UCI 选项 `EvalFile` 一致。
+
+详见 `evidence/game-01/rea-evidence-summary.md`。

@@ -112,3 +112,12 @@ CommandLine: "D:/SteamLibrary/steamapps/common/Just Xiangqi/JustXiangqi_Data/Str
 - Pikafish 的多线程/哈希设置：代码只设置 `MultiPV`，未设置 `Threads`/`Hash`，因此使用引擎默认值（Threads=1、Hash=16）。 [有证据支持：`rg "setoption"` 仅命中 MultiPV / ShowWDL]
 - `GetSimpleKillMove` 的完整实现细节未逐行审计。 [有证据支持]
 - 动画时长与“思考时间”的映射只影响观感，不参与决策。 [已验证：`PlayAIMoveAnimation` 只读 `thinkingTimeSpan` 做等待]
+
+## 8. REA / Ghidra 证据
+
+- 概览：`rea analyze`（Ghidra 12.2）`evidence_id=ev_a16b99431fe74339b39318e46ccfd76b9573805b9ee3646d9adcf78879f957b3`；PE/x86_64，2,924 个过程，1,740 个字符串。
+- UCI 入口字符串：`setoption` @ `0x14014aaf2`、`info depth ` @ `0x14014b0e0`、` multipv ` @ `0x14014b10c`、`setoption name Threads value ` @ `0x1401353b8`、`setoption name Hash value ` @ `0x1401353d6`。
+- 搜索/线程类符号：`N9Stockfish6Search13SearchManagerE` @ `0x140149a96`、`N9Stockfish6Search14ISearchManagerE` @ `0x14014a1b8`、`Stockfish6Thread` 构造相关符号。
+- 与客户端 `ProcessManager` 的解析逻辑（`info depth/cp/mate/pv/wdl`）一致；REA 证据确认“客户端只做文本协议解析，真实搜索在本地引擎内部”。
+
+详见 `evidence/game-01/rea-evidence-summary.md`。

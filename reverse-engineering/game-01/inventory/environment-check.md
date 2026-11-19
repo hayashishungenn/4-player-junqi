@@ -9,8 +9,9 @@
 | Node.js | v26.13.1 | `node -v`；REA 要求 26+，满足 |
 | npm | 11.20.0 | `npm -v` |
 | REA | `rea@6.9.0`，路径 `C:\Users\Hayas\AppData\Roaming\npm\rea` | `rea --version`、`which rea` |
-| REA doctor | `healthy: false`、`environment_healthy: false` | `rea doctor` |
-| Ghidra | 未配置（`GHIDRA_INSTALL_DIR` 未设置，要求 12.x ≥12.1） | `rea doctor` |
+| REA doctor | `healthy: false` → 配置 Ghidra/JDK 25 后 `ghidra` 相关项为 healthy | `rea doctor` |
+| Ghidra | **已安装 12.2**：`D:\tools\ghidra_12.2_PUBLIC`（REA 要求 12.x ≥12.1） | `rea doctor`：`ghidra-version: 12.2` |
+| JDK for Ghidra | **Temurin 25.0.5**：`D:\tools\jdk-25.0.5+8`（Ghidra 12.2 要求 JDK 25+） | `java -version`、`rea doctor` |
 | Hopper | 缺失（Windows 不适用） | `rea doctor` |
 | IDA | 未注册 MCP | `rea doctor` |
 | Kuna | 未配置 | `rea doctor` |
