@@ -107,7 +107,7 @@ PORT=3100 SIGUO_DATA_DIR=... SIGUO_HISTORY_DIR=... node server/server.js
 
 ## 7. 已知阻塞
 
-- `UnityPlayer.dll` 体积大，Ghidra 默认 330s 超时；已提高超时重试，结果需单独确认。
+- `UnityPlayer.dll` 体积大，Ghidra 默认 330s 超时；提高超时的重试被中断，尚未完成。
 - 主工程 4 个基线测试失败。
 - PyTorch 未安装，P7 前需配置。
 - BOT API 依赖账号/服务器，后续联调需本地启动服务并创建 BOT 账号。
