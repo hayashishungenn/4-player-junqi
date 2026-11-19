@@ -52,7 +52,9 @@
 
 - GPU：RTX 5070 Ti Laptop 12GB（compute cap 12.0，driver 621.24）。CUDA 版 torch wheel（cu128，2.75GB）因代理不稳定下载受阻，多进程并发写损坏后已单进程重下（进行中）。CPU 版 torch 2.15.0 已验证可训练。
 - Champion/Challenger（Commit `9aee399`）：`neural-bot/model_registry.py` 版本化快照（版本目录 + 权重 sha256 + meta），历史模型不可覆盖；晋级门槛 `is_significant`（样本≥40、胜率≥0.55、Wilson 下界≥0.50）才允许 promote，记录评测结果/晋级原因/Git Commit。测试 `test_model_registry.py`（3 项）全通过。
-- 训练器（Commit `e7a97b2`）：`--seed` 可复现（random/torch/cuda 全种子），每局记录含 seed，汇总含完整实验参数与设备（seed/modes/hidden/lr/temperature/discount/epochs/device/cuda_version/torch_version/gpu_name）。实测 2 局 alliance+ffa 验证 seed=99 正确写入。
+- 评测闭环（Commit `301c923`）：`neural-bot/evaluate_champion.py` 让两个权重在自对弈环境对打，产出 `challenger_win_rate` 与 Wilson `challenger_ci_low`，可直接喂给 `is_significant`。实测同权重 6 局 alliance 全和棋 → `is_significant` 以「样本不足 6<40」正确拒绝晋级，闭环可用。
+- 训练器（Commit `e7a97b2`）：`--seed` 可复现（random/torch/cuda 全种子），每局记录含 seed，汇总含完整实验参数与设备（seed/modes/hidden/lr/temperature/discount/epochs/device/cuda/torch_version/gpu_name）。实测 2 局验证 seed=99 正确写入。
+- 评测套件（Commit `54a3ec1`）：`scripts/run-eval-suite.js` 一键串行运行 100/500/1000 局 × ffa/alliance，汇总可重复。
 - 信息边界：审查 `Encoder.encode`——暗子 `type=null` 映射为 UNKNOWN，未把真实隐藏兵种输入网络；联盟关系用 `relation()` 编码。
 
 ## P10 逐手评分校准（Commit `64571cb`）
