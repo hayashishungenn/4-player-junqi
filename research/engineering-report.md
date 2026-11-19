@@ -22,7 +22,7 @@
   - 超时终止（`ANALYSIS_TIMEOUT`）、失败报告（`ANALYSIS_FAILED`/`WORKER_ERROR`）；
   - 相同任务键去重（`taskKey` 含房间/预算/日志规模，缓存期内复用 Promise）。
 - 主线程 HTTP API 结构与返回兼容（仍同步返回完整报告，只是计算在 Worker）。
-- 测试 `test/analysis-runner.test.js`（5 项：预算耗尽、去重、并发上限、任务键、失败报告）全通过。
+- 测试 `test/analysis-runner.test.js`（6 项：预算耗尽、去重、并发上限、任务键、超时终止、失败报告）全通过。超时终止端到端测试通过测试专用参数让 Worker 延迟，验证超预算被 `terminate`、返回 `ANALYSIS_TIMEOUT` 且 `timedOut` 计数增长（Commit `ed4bfea`）。
 - 集成 `test/analysis-async.test.js`：24 步棋谱分析期间连发 8 次 `/api/analysis/status`，**主线程最大延迟 10ms**（`[10,2,2,2,2,2,1,1]`），证明不阻塞走棋/聊天/BOT。
 
 ### P7.3 复盘正确性（Commit `b7adc6a`）
