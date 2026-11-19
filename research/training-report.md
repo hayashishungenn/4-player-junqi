@@ -140,6 +140,7 @@ python self_play.py --games 6 --device cpu --modes alliance \
 | 8 env × 250 iterations | 崩溃于 snapshot 深拷贝弹窗（桌面 GPU 竞争） |
 | 4 env × 200 iterations × batch 256 | `CUDA error: out of memory` |
 | 1 env × 32 steps × batch 32 | `CUBLAS_STATUS_EXECUTION_FAILED`（GPU 被桌面抢占时） |
+| GPU 单步推理 | 空闲 3.53–3.59 ms；与 CPU batch=1 镜像测量时正态 4.9–5.6 ms（含长训并发干扰） |
 
 **结论**：5×10^7 步预算需要 1000+ 小时连续训练，本会话桌面共享 11.9 GB VRAM 最高仅可跑通 2 env × 64 steps 串行训练。目标胜率 65%>>**22.5%** 需要远超单会话时长。
 
