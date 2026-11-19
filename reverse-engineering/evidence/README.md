@@ -65,6 +65,26 @@ candidate_ids[4]: ghidra,hopper,ida,kuna
 
 本会话工具清单中没有 `mcp__rea__*` 工具，REA 未以 MCP 方式连接。
 
+### REA 发布面审计（可执行部分）
+
+对三个关键 PE 产物执行 `rea audit-release-exposure`，均成功返回 Evidence：
+
+| 产物 | evidence_id | 检查项 |
+|---|---|---|
+| `JustXiangqi.exe` | `ev_2457f011057401d8735469cdc6a68c764a89cb82bc78028363240e035e728d12` | 15 |
+| `UnityPlayer.dll` | `ev_b5b0218263106822c8d112f75ef9301933fc7f8d20afeafdd61186518cc126eb` | 15 |
+| `Assembly-CSharp.dll` | `ev_9e0391860752e94f30c3b176d1442b86d901044f54f29641116ff777968a4132` | 15 |
+
+完整输出：`game-01/rea-audit-*.txt`。
+
+关键发现：
+
+- 三个产物均 `native.pdb_path: exposed`（severity low，confidence observed）。
+- `JustXiangqi.exe` 泄漏 Unity 构建路径：`C:\buildslave\unity\build\artifacts\WindowsPlayer\Win64_VS2019_nondev_m_r\WindowsPlayer_Master_mono_x64.pdb`。
+- `Assembly-CSharp.dll` 泄漏原始工程名：`C:\Unity\ChineseChess_Windows\Temp\Assembly-CSharp.pdb`。
+- `native.debug_companions` 均为 `not_observed`（未随包附带 PDB）。
+- `android.manifest` 为 `not_assessed`（非 APK，符合预期）。
+
 ## Pikafish UCI 握手
 
 ```text

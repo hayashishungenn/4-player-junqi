@@ -1,0 +1,252 @@
+evidence_id: ev_2457f011057401d8735469cdc6a68c764a89cb82bc78028363240e035e728d12
+subject:
+  name: JustXiangqi.exe
+  digest:
+    sha256: fdff63249900060815bb3832133007d880f2116f2ba00ea725961ad981e69ca8
+  local_path: "D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+  format: pe
+  architecture: null
+provider:
+  id: rea-release-exposure
+  name: REA release exposure audit
+  version: "1"
+analysis_profile: null
+predicate_type: rea.analysis
+operation: audit_release_exposure
+parameters:
+  path: "D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+  max_file_bytes: 268435456
+raw_result: null
+normalized_result:
+  target:
+    selected_path: "D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+    kind: executable
+    format: pe
+    sha256: fdff63249900060815bb3832133007d880f2116f2ba00ea725961ad981e69ca8
+  checks[15]:
+    - id: javascript.source_map_sources
+      status: not_observed
+      severity: null
+      confidence: observed
+      observation:
+        counts:
+          embedded: 0
+          without_sources: 0
+          unparsed: 0
+          skipped: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Ship the release without sourcesContent. Remove the source maps or omit sourcesContent from maps that ship.
+      next_probe: null
+    - id: javascript.source_maps
+      status: not_observed
+      severity: null
+      confidence: observed
+      observation:
+        counts:
+          embedded: 0
+          without_sources: 0
+          unparsed: 0
+          skipped: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Do not ship source maps beside the release.
+      next_probe: null
+    - id: electron.run_as_node
+      status: not_applicable
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          images: 1
+          implications: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Set FuseV1Options.RunAsNode to false with @electron/fuses before packaging.
+      next_probe: inspect_electron_fuses
+    - id: electron.asar_integrity
+      status: not_applicable
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          images: 1
+          implications: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Set FuseV1Options.EnableEmbeddedAsarIntegrityValidation to true with @electron/fuses. Electron compiles this check for macOS and Windows; an ELF byte stays unknown.
+      next_probe: inspect_electron_fuses
+    - id: electron.only_load_from_asar
+      status: not_applicable
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          images: 1
+          implications: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Set FuseV1Options.OnlyLoadAppFromAsar to true with @electron/fuses so the packaged app loads application code from app.asar.
+      next_probe: inspect_electron_fuses
+    - id: electron.node_cli_inspect
+      status: not_applicable
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          images: 1
+          implications: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Set FuseV1Options.EnableNodeCliInspectArguments to false with @electron/fuses so the packaged app ignores --inspect.
+      next_probe: inspect_electron_fuses
+    - id: packaging.extractable_payload
+      status: not_observed
+      severity: null
+      confidence: observed
+      observation:
+        counts:
+          readable_members: 0
+          unreadable_members: 0
+          formats: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Readable members are part of this package format. Treat packaged sources as public. This check does not rewrite the artifact.
+      next_probe: inspect_artifact
+    - id: native.debug_companions
+      status: not_observed
+      severity: null
+      confidence: observed
+      observation:
+        counts:
+          companions: 0
+          skipped: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: "Do not ship .pdb, .dSYM, .debug, or linker map files beside the release."
+      next_probe: null
+    - id: native.pdb_path
+      status: exposed
+      severity: low
+      confidence: observed
+      observation:
+        counts:
+          examined: 1
+          paths: 1
+          failed: 0
+        samples[1]: "C:\\buildslave\\unity\\build\\artifacts\\WindowsPlayer\\Win64_VS2019_nondev_m_r\\WindowsPlayer_Master_mono_x64.pdb"
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: "Rebuild without a CodeView PDB path, or accept that the path string is recoverable from the PE. The PDB file itself is a separate check."
+      next_probe: null
+    - id: go.build_paths
+      status: unknown
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          images: 1
+          paths: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Rebuild with -trimpath so file paths are not written into the binary. Module names can remain.
+      next_probe: inspect_go_binary
+    - id: rust.dependency_metadata
+      status: unknown
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          images: 1
+          packages: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Omit cargo-auditable metadata from the release if the crate list should not ship.
+      next_probe: inspect_rust_binary
+    - id: text.credential_markers
+      status: not_applicable
+      severity: null
+      confidence: observed
+      observation:
+        counts:
+          scanned_members: 0
+          skipped_members: 0
+          omitted_hits: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: Remove the provider-prefixed credential from the shipped text and rotate it if it is real. This check reports the rule id and location only.
+      next_probe: null
+    - id: native.hardening
+      status: not_assessed
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          assessed: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: This audit does not assess native hardening. Use inspect_binary_hardening when that tool is available.
+      next_probe: inspect_binary_hardening
+    - id: macho.hardened_runtime
+      status: not_assessed
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          assessed: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: "This audit does not assess the Mach-O hardened runtime. inspect_signature reads code signatures and would change this tool's effects, so it stays a next probe."
+      next_probe: inspect_signature
+    - id: android.manifest
+      status: not_assessed
+      severity: null
+      confidence: inferred
+      observation:
+        counts:
+          assessed: 0
+        samples: []
+      locations[1]{kind,path}:
+        artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+      remediation: "This audit does not read Android manifests. Use inspect_android_package, which needs JADX."
+      next_probe: inspect_android_package
+  summary:
+    by_status:
+      exposed: 1
+      not_observed: 4
+      not_applicable: 5
+      unknown: 2
+      not_assessed: 3
+    by_severity:
+      high: 0
+      medium: 0
+      low: 1
+      info: 0
+    highest_exposed_severity: low
+    no_exposure_observed_in_assessed_checks: false
+  coverage:
+    allowances[8]: Selected file reads stop at 268435456 bytes.,Text member scans read at most 262144 bytes each and 4194304 bytes in total.,HTML script targets keep at most 1048576 bytes of resolved paths. Later targets stay unassessed.,Local source map targets keep at most 1048576 bytes of resolved paths. Later targets stay unassessed.,Source map scans read at most 32 maps and 1048576 bytes each. sourcesContent text is counted and then dropped.,"Other files and package members are identified from their first 4096 bytes, and those without a NUL byte in that prefix are scanned as text. Up to 64 packaged PE images are read for debug records, 262144 bytes each.","Packaged ELF, Mach-O, and PE images are read in full and copied to a temporary file to probe for an embedded package. They share one max_file_bytes allowance, and an image that does not fit is not probed.","Go, Rust, and Electron fuse readers run on at most 4 native images."
+    omitted: []
+  limitations[2]: This report states what static analysis of the selected artifact recovered. It does not establish that the application is secure.,Inventory covers root bytes only; child container entries were not examined.
+confidence: observed
+authority: shipped-artifact
+environment: null
+limitations[2]: This report states what static analysis of the selected artifact recovered. It does not establish that the application is secure.,Inventory covers root bytes only; child container entries were not examined.
+relationship_coverage: null
+locations[1]{kind,path}:
+  artifact-path,"D:\\SteamLibrary\\steamapps\\common\\Just Xiangqi\\JustXiangqi.exe"
+evidence_links: []
+caller_input_path: "D:/SteamLibrary/steamapps/common/Just Xiangqi/JustXiangqi.exe"

@@ -70,3 +70,11 @@
 - 未复制商业源代码、素材、商标或私有接口到四国军棋工程。
 - 本档案仅记录机制与设计思路，代码引用为分析用途。
 - 原始安装包未被修改。
+
+## 7. REA Evidence 补充
+
+| 结论 | Evidence |
+|---|---|
+| 三个 PE 产物可通过 REA 发布面审计 | `evidence/game-01/rea-audit-*.txt`，15 项检查 |
+| 产物残留 PDB 路径 | `native.pdb_path: exposed`；exe 指向 Unity 构建机，dll 指向 `ChineseChess_Windows` 工程 |
+| 未附带 PDB | `native.debug_companions: not_observed` |

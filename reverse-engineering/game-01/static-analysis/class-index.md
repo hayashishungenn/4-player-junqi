@@ -1,6 +1,6 @@
 # game-01 关键类与方法索引
 
-反编译方式：`ilspycmd -p` 反编译 `Assembly-CSharp.dll`，得到 690 个 `.cs`、744 个类声明。以下行号均指 `static-analysis/decompiled/` 下的文件。
+反编译方式：`ilspycmd -p` 反编译 `Assembly-CSharp.dll`，得到 690 个 `.cs`。全量类型声明（class/struct/enum/interface，含嵌套）共 964 条，见 `full-class-index.md`；其中 `class` 声明 744 条。以下行号均指 `static-analysis/decompiled/` 下的文件。
 
 ## 1. AI 与搜索
 

@@ -46,3 +46,23 @@
 ## 6. 原始文件完整性
 
 分析过程仅读取与哈希，未修改、未覆盖、未卸载。关键哈希见 `inventory/hashes.txt`。
+
+## 7. REA 发布面审计
+
+`rea audit-release-exposure` 对三个 PE 产物均成功返回 Evidence（15 项检查）：
+
+| 产物 | evidence_id |
+|---|---|
+| `JustXiangqi.exe` | `ev_2457f011057401d8735469cdc6a68c764a89cb82bc78028363240e035e728d12` |
+| `UnityPlayer.dll` | `ev_b5b0218263106822c8d112f75ef9301933fc7f8d20afeafdd61186518cc126eb` |
+| `Assembly-CSharp.dll` | `ev_9e0391860752e94f30c3b176d1442b86d901044f54f29641116ff777968a4132` |
+
+结果要点：
+
+- `native.pdb_path: exposed`：三个产物均残留 CodeView PDB 路径（severity low）。
+- `JustXiangqi.exe` 路径指向 Unity 官方构建机 `buildslave\unity\...\WindowsPlayer_Master_mono_x64.pdb`。
+- `Assembly-CSharp.dll` 路径为 `C:\Unity\ChineseChess_Windows\Temp\Assembly-CSharp.pdb`，**泄漏原始工程名 `ChineseChess_Windows`**。
+- `native.debug_companions: not_observed`：未随包附带 PDB 文件。
+- `android.manifest: not_assessed`：非 APK，符合预期。
+
+完整输出见 `evidence/game-01/rea-audit-*.txt`。这是本次能够实际执行的 REA 证据链；REA 的原生反编译提供者（Ghidra/IDA）仍未配置。
