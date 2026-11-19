@@ -84,3 +84,14 @@ python self_play.py --games 6 --device cpu --modes alliance \
 2. **阶段四「FSP 至 5×10^7 步、胜率 ≥80%」完全未启动**；距离当前进度还有 5 个数量级以上的训练量。
 3. **阶段五「GA 50 代」未做**：已提交合法布阵库 400 套（`formations_200.json`）、双侧对局 fitness 的 Top-200 差异化布阵输出（`formations_top200.json`）和 GA 筛选脚本（`ga_formation.py`），但未做 50 代遗传搜索、未以训练行棋模型为打分依据；Top-200 的 selection 只用了规则基线互打作快速 fitness。
 4. **阶段二验收**：启发式 Bot 对随机策略，两配置下胜率 ≈96%（team=0 961/0/39、team=1 950/0/50），排除和局 100%/100%（Task 书称≥99%）。
+
+### 5.3 机制性验证（对手池 + 高密度奖励，真实可复现）
+
+| 配置 | Opponents | Iter / Batch | VRAM | 胜率 vs 规则基线 |
+|---|---|---|---|---|
+| 早期 | 规则基线（pool=1） | 80×128 / 128 | 1.82 GB | 5.0%（argmax 2/40） |
+| Pool≥10 | self-play 池（pool=10） | 120×128 / 128 | 3.38 GB | 10.0%（4/40） |
+| Pool≥20 | self-play 池（pool=20） | 200×128 / 256 | 6.08 GB | **22.5%**（9/40） |
+| Pool≥20（长训中） | self-play 池（pool≥20） | 400×64 / 256 | 6.08–7 GB | 长训中，完成后更新 |
+
+密集获取奖励 ×10 修复（`val_map` ×10）：纯和局塌陷后 Rew 转正，但 argmax 胜率在本会话 02 轮仍然单 MPDL。
