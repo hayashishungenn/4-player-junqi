@@ -59,6 +59,7 @@ python self_play.py --games 6 --device cpu --modes alliance \
 - 未运行 CUDA 训练（本机为 CPU 版 torch；GPU 为 RTX 5070 Ti，需安装 CUDA 版 torch）。
 - 未做 1000+ 局的大规模训练与"历史最佳对抗"棋力曲线。
 - 训练记录写入临时目录；若需长期留存，应配置固定 `--record` 路径并纳入运维（不入库）。
+- 8env×128steps×BF16×80 迭代的真实对战收益：胜率 5/30（16.7%），VF 从 0.71 降到 0.0017，PG 降到 0.03 —— 损失收敛路径正常，但训练量与 1×10^7 目标相差五到六个数量级，未突破 65% 验收线。
 
 ## 5. GPU/CUDA 现实验证（2026-11-19 补记，用户自有 `train_junqi_5070ti.py`）
 
