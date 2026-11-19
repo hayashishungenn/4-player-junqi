@@ -85,3 +85,43 @@ if (!cachedAIConfigs.ContainsKey(key))
 - `CAREER_MODE_AI_CONFIGURATIONS` 的 16 档逐档参数未展开列表（结构同普通表，量较大）。
 - Pikafish 的实际棋力上限未做对局测试；档 12 为 depth 16/17，配合默认 1 线程。
 - 难度与胜率的标定过程（为何 1800 ELO 对应 depth 6）无文档，属设计选择。 [未知]
+
+## 9. 生涯模式 16 档配置（静态补充）
+
+`CAREER_MODE_AI_CONFIGURATIONS` 键为 1–16，逐档解析结果：
+
+| 档 | 引擎与深度 | 随机性 | 前 3 步开局库 |
+|---:|---|---|---|
+| 1 | Native_Easy 0/2 交替 + ElephantEyes 2 | — | 是 |
+| 2 | Native_Medium 2 / ElephantEyes 2 | — | 是 |
+| 3 | ElephantEyes 1 | — | — |
+| 4 | Pikafish 1（两套，随机 2/3） | 2–3 | — |
+| 5 | Pikafish 2 / ElephantEyes 2 | 2 | — |
+| 6 | ElephantEyes 3 / Pikafish 3 | 3 | — |
+| 7 | ElephantEyes 4 / Pikafish 4 | 3 | — |
+| 8 | Pikafish 5 / ElephantEyes 5 | 3 | — |
+| 9 | Pikafish 6 | 3 | — |
+| 10 | Pikafish 7 | 3 | — |
+| 11 | Pikafish 8 | 2 | — |
+| 12 | Pikafish 9（两套，随机 2） | 2 | — |
+| 13 | Pikafish 10 | 1（默认） | — |
+| 14 | Pikafish 11 / 12 | 1 | — |
+| 15 | Pikafish 13 / 14 | 1 | — |
+| 16 | Pikafish 15 / 16 | 1 | — |
+
+特点：
+
+- 生涯前期（1–8）刻意在原生 AI、ElephantEyes、Pikafish 之间混用，制造“对手水平参差”的剧情感。
+- 9 档起完全交给 Pikafish，靠深度与随机性区分。
+- 与普通 13 档相比，生涯档位更密（1–16），最高深度 16，与普通最高档 17 接近。
+- 生涯配置的 ELO 展示不查 `AI_ELO_RATING`（该表仅 13 项），而用角色自带的 `EloScore`，避免越界。
+
+## 10. 轮换策略
+
+`AIConfiguration` 有三个子类：
+
+- `StaticAIConfiguration`：整局固定一组参数（多数档位）。
+- `StepBasedAIConfiguration`：按 `StepBasedNumbers` 轮换，如档 0/1 的 `[1,1]` 表示逐步交替。
+- `ProbabilityBasedAIConfiguration`：按概率选择参数。
+
+`rg "ProbabilityBasedAIConfiguration"` 在配置表中未发现实例化，[有证据支持] 该类为预留实现，当前难度表未使用。

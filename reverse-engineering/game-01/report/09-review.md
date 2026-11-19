@@ -103,3 +103,43 @@
 - **评分与人类语言解耦**：引擎只给 cp/mate/wdl，UI 层再映射为“优/劣/失误/漏杀”。
 - **提示有成本**：生涯/残局/训练都用次数限制提示，形成“练习—反馈—约束”的陪练闭环。
 - **不虚构服务器分析**：全部评分来自本地引擎。 [已验证]
+
+## 6. 提示功能的静态补充（不依赖运行）
+
+### 6.1 触发条件
+
+`IsEndgameHintMoveAvailable()`（`GameManager.cs:5523-5552`）要求同时满足：
+
+1. 模式为 `Local_CareerMode_Training` 或 `Local_Endgame`。
+2. `gameState == WaitingInput`（轮到我方）。
+3. 本回合未使用过提示（`isRepeatedActionInSameTurn[HintMove] == false`）。
+4. 次数未耗尽：训练看 `currentTraining.HintMoveCount`；残局看 `hintMoveCount`。
+
+任一条不满足，`EndgameHintMoveButton` 直接置灰（`GameManager.cs:2019`）。
+
+### 6.2 调用链
+
+```text
+EndgameHintMoveButton.onClick
+  → RequestEndgameMoveAnalysis(currentPieceColor, 1000f)     GameManager.cs:5320
+      → 若本回合已提示过：只重置标记，不再请求
+      → 否则扣减次数（训练/残局各自字段）
+      → analysisAIProcess: position fen <当前局面> <行棋方>
+      → GetMoveAnalyses(1000f)：go → 等 1s → stop → 取 MultiPV 第一条
+      → ShowRecommendedMoveArrow(move)                      GameManager.cs:4260
+          → 箭头精灵 "Arrows/Arrow_{dx}_{dy}"
+          → 起点/终点图标 + Show_Vertical / Show_Horizontal 动画
+```
+
+### 6.3 次数规则
+
+- 初始值：`Utils.LoadGameData("EndgameHintMoveCount", 3)`（`GameManager.cs:897`）。
+- 每通过一关：`hintMoveCount = Math.Min(9, hintMoveCount + 1)`（`GameManager.cs:5238`）。
+- 使用一次：`--hintMoveCount` 并写回 ES3（`GameManager.cs:5343`、`:3863`、`:3915`）。
+- 界面文案与数值一致：残局入口显示“推荐着法次数 1”“最多 9 次”。
+
+### 6.4 动态未复现的原因分析
+
+- 首次点击后 `isRepeatedActionInSameTurn[HintMove]` 被置为 true；在未走子的同一回合内再次点击会被条件 3 拦截，按钮置灰。
+- 箭头动画为短时播放（`Show_Vertical/Horizontal`），若首次点击已触发，后续截图可能错过动画；但计数应已扣减。
+- 由于用户要求不再启动游戏，未进一步核对计数变化；该点保留为“有证据支持、未完整验证”。
