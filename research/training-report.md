@@ -118,7 +118,11 @@ python self_play.py --games 6 --device cpu --modes alliance \
 | Pool≥20 | self-play 池（pool=20） | 200×128 / 256 | 6.08 GB | **22.5%**（9/40） |
 | Pool≥15 | self-play 池（pool=15） | 200×64 / 64 | 3.42 GB | 10.0%（3/30） |
 | Pool≥12 | self-play 池（pool=12） | 150×64 / 64 | 3.82 GB | **10.0%（argmax 3/30）** |
-| Pool≥12 | self-play 池（pool=12） | 200×64 / 64 | 3.42 GB | 10.0%（argmax argmax + ） |
+| 12 checkpoint 扫描 | Iter 010~120（save 自动） | - | 11/12 全平局（唯一变分 iter040 1/10 胜） |
+| Pool=20 Iter 200（第一次记录） | mode=argmax | 6.08 GB | **22.5%**（9/40） |
+| Pool=20 Iter 200（复测） | mode=argmax | 5.35 GB | **15.0%**（6/40） |
+
+**说明**：Pool=20 Iter200 复测与首测产生不同胜率（22.5% → 15.0%），同 YAML/代码路径下的运行确定随机种子驱动差异。阶段二验收所谓"固定对手=规则基线"是稳定复现的，但训练曲线对随机种子高度敏感，胜率天花板 ≈ 22.5%。
 | Pool≥17 | self-play 池（pool=17） | 300×64 / 256 | 5.30 GB | **0.0%**（30/30 平局，argmax） |
 | 最新（pool=15 best 150-Iter 落盘） | self-play 池 | 150×64 / 64 | 4.38 GB | **6.0%**（6/100 argmax, 94 平局） |
 
