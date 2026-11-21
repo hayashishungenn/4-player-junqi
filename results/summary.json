@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "type": "meta",
+    "impl_file": "D:\\4-player-junqi\\train_junqi_5070ti.py",
+    "torch": "2.10.0+cu128",
+    "cuda": true,
+    "baseline": "HeuristicBotWrapper",
+    "games_per_candidate": 100,
+    "seed_base": 90000,
+    "max_steps": 240,
+    "checkpoint_sha256": {
+      "junqi_best_iter240.pt": "d2d37c1b32828601c62879c15ca6c00db2e87ac66222a0741975ffeddf48c6b0",
+      "junqi_pool20_iter248.pt": "7d330eb39cf5c4530e02afbe2e6cdedeeb730e958f4e234fc793dfa7f55bba11",
+      "junqi_iter688.pt": "260d3cd1112e47491616c3a7c16d025c12c084bab8567644a0d238f0e4ad40aa"
+    },
+    "model_arch": "JunqiActorCritic hidden=160 blocks=8",
+    "seat_policy": "even game: model=team0; odd game: model=team1"
+  },
+  "summary": {
+    "junqi_best_iter240.pt": {
+      "n": 100,
+      "wins": 20,
+      "losses": 0,
+      "draws": 80,
+      "decisive": 20
+    },
+    "junqi_pool20_iter248.pt": {
+      "n": 100,
+      "wins": 22,
+      "losses": 1,
+      "draws": 77,
+      "decisive": 23
+    },
+    "junqi_iter688.pt": {
+      "n": 100,
+      "wins": 25,
+      "losses": 2,
+      "draws": 73,
+      "decisive": 27
+    }
+  },
+  "pairwise_ci": "见控制台输出 / 报告"
+}
