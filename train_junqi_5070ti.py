@@ -828,6 +828,9 @@ class HighThroughputSelfPlayTrainer:
         T, N = self.cfg.steps_per_env, self.cfg.num_envs
         env_cursors = np.zeros(N, dtype=np.int32)
         pending_step = [None] * N
+        # 每条轨迹末端（cursor 达到 T）的 Team 0 状态，供 GAE 做 bootstrap。
+        bootstrap_obs = torch.zeros((N, 60, 17, 17), dtype=torch.float32, device=self.device)
+        bootstrap_mask = torch.zeros((N, MAX_ACTIONS), dtype=torch.bool, device=self.device)
         pool_size = len(self.opponent_pool) if self.cfg.opponent_pool_enabled else 1
 
         t0 = time.perf_counter()
@@ -864,23 +867,34 @@ class HighThroughputSelfPlayTrainer:
                     self.buf_dones[c, i] = float(self.vec_env.done[i])
                     env_cursors[i] += 1
                     pending_step[i] = None
+                    if env_cursors[i] == T:
+                        # ready 时 worker 已写入回到 Team 0 的观测；done 时为新局观测，
+                        # 但对应 buf_dones=1，bootstrap 值会被 GAE 的 non_terminal 屏蔽。
+                        bootstrap_obs[i] = torch.from_numpy(self.vec_env.obs[i]).to(self.device)
+                        bootstrap_mask[i] = torch.from_numpy(self.vec_env.mask[i]).to(self.device)
 
         elapsed = time.perf_counter() - t0
         sps = total_env_ticks / max(elapsed, 1e-6)
         mean_rew = float(self.buf_rewards.mean().item())
+        self.bootstrap_obs = bootstrap_obs
+        self.bootstrap_mask = bootstrap_mask
         return sps, mean_rew
 
     def update_ppo(self, ent_coef: float) -> Tuple[float, float]:
         """在 RTX 5070 Ti 显存内直接计算 GAE 并执行大批次混合精度 PPO 更新"""
-        self.policy.train()
         T, N = self.cfg.steps_per_env, self.cfg.num_envs
+
+        # 轨迹末端 bootstrap 与采样同模式（eval / running stats），避免 value 口径漂移
+        self.policy.eval()
+        with torch.no_grad(), torch.amp.autocast("cuda", dtype=self.amp_dtype):
+            _, last_values = self.compiled_policy(self.bootstrap_obs, self.bootstrap_mask)
 
         # 1. GPU 原地并行计算多环境 GAE
         advantages = torch.zeros_like(self.buf_rewards)
         last_gae = torch.zeros(N, dtype=torch.float32, device=self.device)
         for t in reversed(range(T)):
             non_terminal = 1.0 - self.buf_dones[t]
-            next_val = self.buf_values[t + 1] if t + 1 < T else torch.zeros(N, device=self.device)
+            next_val = self.buf_values[t + 1] if t + 1 < T else last_values
             delta = self.buf_rewards[t] + self.cfg.gamma * next_val * non_terminal - self.buf_values[t]
             last_gae = delta + self.cfg.gamma * self.cfg.gae_lambda * non_terminal * last_gae
             advantages[t] = last_gae
@@ -892,11 +906,24 @@ class HighThroughputSelfPlayTrainer:
         flat_obs = self.buf_obs.view(T * N, 60, 17, 17)
         flat_mask = self.buf_mask.view(T * N, MAX_ACTIONS)
         flat_act = self.buf_actions.view(T * N)
-        flat_old_logp = self.buf_logprobs.view(T * N)
         flat_adv = advantages.view(T * N)
         flat_ret = returns.view(T * N)
 
         total_samples = T * N
+
+        # old_logp 用 train 模式按 batch_size 分块重算：采样在 eval（running stats）、
+        # 更新在 train（batch stats），直接沿用 buf_logprobs 会让 BatchNorm 统计差异
+        # 混入 importance ratio。分块使两侧 batch 规模一致，同时控制显存峰值。
+        self.policy.train()
+        with torch.no_grad():
+            old_logp_parts = []
+            for start in range(0, total_samples, self.cfg.batch_size):
+                mb = slice(start, start + self.cfg.batch_size)
+                with torch.amp.autocast("cuda", dtype=self.amp_dtype):
+                    logits, _ = self.compiled_policy(flat_obs[mb].float(), flat_mask[mb])
+                old_logp_parts.append(torch.distributions.Categorical(logits=logits).log_prob(flat_act[mb]))
+            flat_old_logp = torch.cat(old_logp_parts)
+
         total_pg, total_vf, steps = 0.0, 0.0, 0
 
         for _ in range(self.cfg.ppo_epochs):
