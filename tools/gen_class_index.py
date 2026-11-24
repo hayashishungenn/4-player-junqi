@@ -1,8 +1,11 @@
 import os, re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
 
 rows = []
 pat = re.compile(r'^\s*(?:public|internal|private|protected|static|sealed|abstract|partial|\s)*\b(class|struct|enum|interface)\s+([A-Za-z_][A-Za-z0-9_]*)')
-base = r'D:\4-player-junqi\reverse-engineering\game-01\static-analysis\decompiled'
+base = ROOT / 'reverse-engineering' / 'game-01' / 'static-analysis' / 'decompiled'
 for root, _, files in os.walk(base):
     for fn in files:
         if not fn.endswith('.cs'):
@@ -15,7 +18,7 @@ for root, _, files in os.walk(base):
                 if m:
                     rows.append((rel, i, m.group(1), m.group(2)))
 rows.sort()
-out_path = r'D:\4-player-junqi\reverse-engineering\game-01\static-analysis\full-class-index.md'
+out_path = ROOT / 'reverse-engineering' / 'game-01' / 'static-analysis' / 'full-class-index.md'
 with open(out_path, 'w', encoding='utf-8', newline='\n') as out:
     out.write('# game-01 全量类型索引\n\n')
     out.write('来源：`ilspycmd` 反编译 `Assembly-CSharp.dll`，共 %d 个 class/struct/enum/interface 声明（含嵌套类型）。\n\n' % len(rows))

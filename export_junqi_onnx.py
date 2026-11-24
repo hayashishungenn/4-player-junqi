@@ -23,7 +23,7 @@ def main():
     onnx_path = HERE / "junqi_actor_critic.onnx"
 
     model = T.JunqiActorCritic(hidden_dim=160, num_blocks=8).cuda().eval()
-    model.load_state_dict(torch.load(ckpt_path, map_location="cuda:0"))
+    model.load_state_dict(torch.load(ckpt_path, map_location="cuda:0", weights_only=True))
 
     dummy_obs = torch.zeros(1, 60, 17, 17, device="cuda")
     dummy_mask = torch.ones(1, T.MAX_ACTIONS, dtype=torch.bool, device="cuda")
@@ -36,8 +36,9 @@ def main():
     print(f"[ONNX] 已导出 {onnx_path.name}")
 
     # PyTorch 原生延迟
-    for _ in range(30):
-        model(dummy_obs, dummy_mask)
+    with torch.no_grad():
+        for _ in range(30):
+            model(dummy_obs, dummy_mask)
     torch.cuda.synchronize()
     t0 = time.perf_counter()
     N = 200

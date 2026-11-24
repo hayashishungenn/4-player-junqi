@@ -1,17 +1,26 @@
 """复评统计：胜率/和局率/排除和局胜率（含分母）、终局原因分布、配对差异区间。
 
-配对：同一 seed（90000+g）下三个模型各自对战同一基线；座位按 g 奇偶轮换。
+配对：同一 seed（seed_base+g）下各模型对战同一基线；座位按 g 奇偶轮换。
 差异区间：对 (modelA胜 - modelB胜) 用配对 bootstrap（重采样 seed）给 95% CI。
 """
 from __future__ import annotations
 
+import argparse
 import json
-import numpy as np
 from collections import Counter, defaultdict
 from pathlib import Path
 
-P = r'D:\4-player-junqi\results\tournament.jsonl'
-rows = [json.loads(l) for l in open(P, encoding='utf-8')]
+import numpy as np
+
+ROOT = Path(__file__).resolve().parent.parent
+ap = argparse.ArgumentParser(description=__doc__)
+ap.add_argument('--data', default=str(ROOT / 'results' / 'tournament.jsonl'))
+ap.add_argument('--out', default=str(ROOT / 'results' / 'summary.json'))
+args = ap.parse_args()
+
+P = Path(args.data)
+OUT = Path(args.out)
+rows = [json.loads(l) for l in P.open(encoding='utf-8')]
 meta = [r for r in rows if r['type'] == 'meta'][0]
 games = [r for r in rows if r['type'] == 'game']
 
@@ -73,6 +82,5 @@ for i in range(len(cks)):
 # 保存机器可读汇总
 out = {"meta": meta, "summary": summary,
        "pairwise_ci": "见控制台输出 / 报告"}
-Path(r'D:\4-player-junqi\results\summary.json').write_text(
-    json.dumps(out, ensure_ascii=False, indent=2), encoding='utf-8')
-print('\nwritten: results/summary.json')
+OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding='utf-8')
+print(f'\nwritten: {OUT}')
