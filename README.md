@@ -22,6 +22,7 @@
 - `reverse-engineering/README.md`、`reverse-engineering/DELIVERABLES.md`、`reverse-engineering/game-01/report/`（12 份）、`reverse-engineering/comparison/recommendations.md`
 - `research/repo-analysis/`：四份源码分析报告 + `integration-plan.md`
 - `research/ai-algorithm.md`：AI 算法说明；`research/evaluation-report.md`：测试与棋力评测；`research/training-report.md`：自我对弈训练执行报告
+- `research/next-phase-task-book.md`：下一阶段任务书（验收契约与证据目录，草案）
 - `research/p0-baseline.md`：基线与既有失败测试
 
 主工程新增/修改（仓库内 `code/siguo-junqi/`，本地开发目录 `workspace/siguo-junqi`）：
@@ -40,7 +41,7 @@
 - 新模块测试：逐手评分 4 项、复盘 5 项、难度 3 项、加密通道 API 集成断言 1 项、1 真人 + 3 AI 联盟端到端 1 项，全部通过。
 - 服务器启动：`PORT=3199 node server/server.js` → HTTP 200（47,340 bytes）；新 API 经加密客户端验证返回 200 与正确结构。
 - 自我对弈：CPU 实跑 6 局联盟对局（全和棋，平均 loss -0.769343），训练记录与汇总产出，权重未入库。
-- 棋力 smoke：两批共 16 局（已决 10 局 B 6:4 A），不具统计显著性。
+- 棋力 smoke：两批共 16 局（已决 10 局 B 6:4 A），**仅为早期小样、非当前基线**；当前基线是 300 局/候选配对复评（含和局胜率 20–25%，见 `results/tournament.jsonl`、`results/README.md` 与 `research/next-phase-task-book.md`）。
 - 复盘 CLI 端到端：`node scripts/analyze-replay.js <replay.json> --budget-ms 400 --mode ffa` 成功输出报告与整局摘要。
 - 1 真人 + 3 AI 联盟端到端：`seatsSeen=[north,east,south,west]`，12 步，15 帧 / 30 条棋谱日志（见评测报告）。
 - 本地自我对弈环境：`self_play_env.mjs` 的 `reset(mode=alliance)` / `state` / `board` 正常。
@@ -66,8 +67,9 @@
 
 1. P5 已在 CPU 跑通 6 局联盟自我对弈，但未做 CUDA 训练、1000+ 局大规模训练、历史最佳模型对抗棋力曲线。
 2. 4 个基线既有测试失败未修复（环境依赖/既有缺陷，未改断言）。
-3. 棋力评测为 16 局 smoke（已决 10 局），未做 100+ 局固定布局统计评测，不具统计显著性。
+3. 棋力评测已完成 300 局/候选配对复评并入库（`results/tournament.jsonl`）：含和局主口径当前观测 20–25%，低于 65% 线；两两统计未检出差异（CI 含 0、McNemar p>0.05，不等同于等价）；正式达标判定见 `research/next-phase-task-book.md` 的 P0-01 产物。
 4. 逆向阶段 `UnityPlayer.dll` 深度分析重试被中断，未完成；提示箭头显示等少量场景未实机复现。
+5. 下一阶段评测/训练/接入任务与验收线见 `research/next-phase-task-book.md`（含 65% 口径冻结、评测脚本加固、分层回放审计、单变量消融与产品接入门禁）。
 
 ## 风险
 
