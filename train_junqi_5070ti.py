@@ -704,6 +704,8 @@ class GPUTrainConfig:
     pool_max_size: int = 20
     opponent_pool_enabled: bool = False  # 阶段三：固定对手 = 启发式规则基线
     snapshot_interval: int = 10
+    logp_clamp: float = 20.0             # ratio 上界；达到边界的样本比例单独记录
+    kl_target: float = 0.02              # approx KL 早停阈值；触发后跳过剩余 minibatch
 
 
 class HighThroughputSelfPlayTrainer:
@@ -880,7 +882,7 @@ class HighThroughputSelfPlayTrainer:
         self.bootstrap_mask = bootstrap_mask
         return sps, mean_rew
 
-    def update_ppo(self, ent_coef: float) -> Tuple[float, float]:
+    def update_ppo(self, ent_coef: float) -> Dict[str, float]:
         """在 RTX 5070 Ti 显存内直接计算 GAE 并执行大批次混合精度 PPO 更新"""
         T, N = self.cfg.steps_per_env, self.cfg.num_envs
 
@@ -925,8 +927,13 @@ class HighThroughputSelfPlayTrainer:
             flat_old_logp = torch.cat(old_logp_parts)
 
         total_pg, total_vf, steps = 0.0, 0.0, 0
+        total_kl, total_clip, total_entropy = 0.0, 0.0, 0.0
+        total_grad_norm, total_sat = 0.0, 0.0
+        early_stop = False
 
         for _ in range(self.cfg.ppo_epochs):
+            if early_stop:
+                break
             perm = torch.randperm(total_samples, device=self.device)
             for start in range(0, total_samples, self.cfg.batch_size):
                 mb = perm[start:start + self.cfg.batch_size]
@@ -937,7 +944,16 @@ class HighThroughputSelfPlayTrainer:
                 new_logp = dist.log_prob(flat_act[mb])
                 entropy = dist.entropy().mean()
 
-                ratio = torch.exp(new_logp - flat_old_logp[mb])
+                log_ratio = new_logp - flat_old_logp[mb]
+                clamped_log_ratio = torch.clamp(
+                    log_ratio, -self.cfg.logp_clamp, self.cfg.logp_clamp)
+                ratio = torch.exp(clamped_log_ratio)
+                # k3 approx KL，用 clamp 后的 ratio/log 比避免 exp 溢出污染日志
+                approx_kl = (ratio - 1.0 - clamped_log_ratio).mean()
+                clip_fraction = ((ratio < 1.0 - self.cfg.clip_range) |
+                                 (ratio > 1.0 + self.cfg.clip_range)).float().mean()
+                sat_fraction = (log_ratio.abs() >= self.cfg.logp_clamp).float().mean()
+
                 s1 = ratio * flat_adv[mb]
                 s2 = torch.clamp(ratio, 1.0 - self.cfg.clip_range, 1.0 + self.cfg.clip_range) * flat_adv[mb]
                 pg_loss = -torch.min(s1, s2).mean()
@@ -947,16 +963,35 @@ class HighThroughputSelfPlayTrainer:
                 self.optimizer.zero_grad(set_to_none=True)
                 self.scaler.scale(loss).backward()
                 self.scaler.unscale_(self.optimizer)
-                nn.utils.clip_grad_norm_(self.policy.parameters(), self.cfg.max_grad_norm)
+                grad_norm = nn.utils.clip_grad_norm_(self.policy.parameters(), self.cfg.max_grad_norm)
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
 
                 total_pg += float(pg_loss.item())
                 total_vf += float(vf_loss.item())
+                total_kl += float(approx_kl.item())
+                total_clip += float(clip_fraction.item())
+                total_entropy += float(entropy.item())
+                total_grad_norm += float(grad_norm.item())
+                total_sat += float(sat_fraction.item())
                 steps += 1
 
+                if float(approx_kl.item()) > self.cfg.kl_target:
+                    early_stop = True
+                    break
+
         self.scheduler.step()
-        return total_pg / max(steps, 1), total_vf / max(steps, 1)
+        denom = max(steps, 1)
+        return {
+            "pg": total_pg / denom,
+            "vf": total_vf / denom,
+            "approx_kl": total_kl / denom,
+            "clip_fraction": total_clip / denom,
+            "entropy": total_entropy / denom,
+            "grad_norm": total_grad_norm / denom,
+            "logp_clamp_saturation": total_sat / denom,
+            "early_stop": early_stop,
+        }
 
     def train(self):
         gpu_name = torch.cuda.get_device_name(0)
@@ -975,7 +1010,10 @@ class HighThroughputSelfPlayTrainer:
                 ent_coef = self.cfg.ent_coef_start + (self.cfg.ent_coef_end - self.cfg.ent_coef_start) * progress
 
                 sps, mean_rew = self.collect_rollout(shaping_w)
-                pg_loss, vf_loss = self.update_ppo(ent_coef)
+                m = self.update_ppo(ent_coef)
+                if m["early_stop"]:
+                    print(f"[EARLYSTOP] iter={it:03d} approx_kl={m['approx_kl']:.4f} "
+                          f"target={self.cfg.kl_target}", flush=True)
 
                 if it % self.cfg.snapshot_interval == 0:
                     self._push_snapshot()
@@ -987,7 +1025,10 @@ class HighThroughputSelfPlayTrainer:
                     print(
                         f"[Iter {it:03d}/{self.cfg.total_iterations}] "
                         f"SPS={sps:6.0f} | Rew={mean_rew:+.4f} | "
-                        f"PG={pg_loss:.4f} | VF={vf_loss:.4f} | "
+                        f"PG={m['pg']:.4f} | VF={m['vf']:.4f} | "
+                        f"KL={m['approx_kl']:.4f} | Clip={m['clip_fraction']:.3f} | "
+                        f"Ent={m['entropy']:.4f} | GNorm={m['grad_norm']:.3f} | "
+                        f"ClampSat={m['logp_clamp_saturation']:.3f} | "
                         f"Pool={len(self.opponent_pool):02d} | PeakVRAM={alloc_vram:.2f}GB"
                     )
         finally:
