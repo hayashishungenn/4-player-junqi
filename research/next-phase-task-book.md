@@ -72,10 +72,10 @@ New-Item -ItemType Directory -Force -Path D:\4-player-junqi\results\derived | Ou
 | P0-03 | P0 | 回放审计分层抽样与过期证据刷新 | P0-04b | ✅ 已执行（33 局分层审计 + seed90001 定向复核；iter688 no_capture 仅 1 局已标注不足） |
 | P0-04a/b | P0 | a: torch 环境重建；b: 8 局冒烟 | a: 用户批准；b: P0-02 + a | ✅ a/b 均已完成（CUDA 环境 manifest + 16 局冒烟） |
 | P0-05 | P0 | 旧报告账目与证据订正 | 文档项无依赖；38 次命中复算项依赖 P0-03 | ✅ 订正表已产出；E-05/E-06 已回填，E-02/03/04 仍待 D6 |
-| P1-01 | P1 | 300 局/候选配对复评与功效判定 | P0-01（仅判定）、P0-02/03/04b/05 + D4 | 待决策 |
+| P1-01 | P1 | 300 局/候选配对复评与功效判定 | P0-01（仅判定）、P0-02/03/04b/05 + D4 | ✅ 已完成（5 候选×300 局；iter400 显著优于其余四候选，全部未达 65%） |
 | P1-02 | P1 | c1732af 修复后基线重训 | P0-04a + GPU 独占 + D8 | ✅ 已完成（400 迭代、41 份权重、冻结权重未动） |
 | P1-03 | P1 | val_map ×10→×1 单变量对照 | P1-02 + D8 | 待决策 |
-| P1-04 | P1 | collapse 量化（只加评测快照） | P1-02 + P0-04b | 未开始 |
+| P1-04 | P1 | collapse 量化（只加评测快照） | P1-02 + P0-04b | ✅ 已完成（三快照各 100 局；按冻结判据证据不足） |
 | P2-01 | P2 | 产品接入门禁与上线决策 | P1-01 + 用户决策 | 待决策 |
 
 ### P0-01 冻结口径与 65% 分母
@@ -210,6 +210,7 @@ New-Item -ItemType Directory -Force -Path D:\4-player-junqi\results\derived | Ou
   & $base D:\4-player-junqi\tools\analyze_tournament.py --data D:\4-player-junqi\results\derived\collapse_scan.jsonl --out D:\4-player-junqi\results\derived\stats_collapse_scan.json
   ```
 - **产物**：`collapse_scan.jsonl`、`stats_collapse_scan.json` 及各自 sha256。
+- **状态更新（2026-11-27）**：✅ 完成（判定为证据不足）；日期 = 2026-11-27；证据路径/sha256 = `results/derived/manifest_p1-04.json`（`e0043b4b6fe21a348cacfa8709ca278cb75fbb9227f07389394857ea07378f1e`）、`collapse_scan.jsonl`（`a07075848e830e1eed056fcb1878c1a2ebfc9ab54ce231dc9f0f453bb94c92ff`，301 行）、`stats_collapse_scan.json`（`826bd221571ffe5f03015ff78b2dd0c21a18ddda647fee2c3164a3cb92b7db0f`）、`research/p1-04-result.md`（`6eb44699091ba158af4d0e89fc3a9d61766fe5c9b5b3836500aa9aad0574de86`）；操作者 = Claude Code（本机，用户授权 GPU 时段）。W/N：iter400 45/100=45.0%、iter600 35/100=35.0%、iter800 19/100=19.0%，逐次下降且累计 26pp（满足判据 1）；但相邻「后−前」CI 分别为 [−21,+1] 与 [−27,−5]，首步上界 +1 跨 0（不满足判据 2），按冻结判据写“未观测到/证据不足”，不写 collapse 因果。step_limit 率 51%→61%→79%。
 
 ### P2-01 产品接入门禁与上线决策
 
@@ -227,7 +228,7 @@ New-Item -ItemType Directory -Force -Path D:\4-player-junqi\results\derived | Ou
 | D1 65% 口径 | P0-01、P1-01、P2-01 | 已确认含和局为主；已由 `research/acceptance-criteria.md` 归档 | 排除和局 92.6% 被误读为达标 |
 | D2 GPU 独占 | P0-04a/b、P1-01/02/03/04 | 是否释放桌面占用并给出时段（历史多次 OOM）；P0 冒烟已完成，P1 仍待 | 数据不可比、中途抢占导致作废 |
 | D3 环境重建 | P0-04a、P0-03 | 已于 2026-11-26 执行（见 P0-04a 状态与 `env_manifest.json`）；后续如需新依赖仍须批准 | 审计与复评已可运行 |
-| D4 算力预算 | P1-01/02/03/04 | 是否批准 300–500 局/候选（900–1500 局）与多日训练 | 维持 100 局则 CI 跨 0，无法做取舍 |
+| D4 算力预算 | P1-01/02/03/04 | 已批准 5 候选×300 局（1500 局，2026-11-27；证据 `results/derived/manifest_p1-01.json`）与 P1-04 三快照×100 局（`manifest_p1-04.json`）；多日训练未批准 | 维持 100 局则 CI 跨 0，无法做取舍 |
 | D5 旧资产处置 | P0-05、P1-02 | 旧三份 `.pt` 是否冻结为 pre-fix 归档 | 修复效果被错误归因到旧权重 |
 | D6 布阵库入库 | P0-05 | Top-200 实际 40 套且 workspace 被忽略：补建 ≥200 套入库，还是订正文档为 40 套 | 报告继续声称"≥200 套已入库" |
 | D7 是否上线 | P2-01 | 未达 65% 时是否允许实验分支接入、正式上线门槛 | 误用未显著模型或暗棋口径合规问题 |
