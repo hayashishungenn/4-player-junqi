@@ -18,18 +18,30 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import platform
 import random
+import subprocess
 import sys
 import time
 from pathlib import Path
 
 import numpy as np
-import torch
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-import train_junqi_5070ti as T  # noqa: E402
+# torch / 训练实现延迟到参数解析之后导入：无 torch 的环境仍可用 --help。
+torch = None
+T = None
+# 最小基线注册表：名称 -> 返回实现类的工厂（调用前需先 _load_runtime()）。
+BASELINE_REGISTRY = {"HeuristicBotWrapper": lambda: T.HeuristicBotWrapper()}
+
+
+def _load_runtime():
+    global torch, T
+    import torch as _torch
+    import train_junqi_5070ti as _impl
+    torch, T = _torch, _impl
 
 
 def sha256(path: str) -> str:
@@ -38,6 +50,22 @@ def sha256(path: str) -> str:
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def checkpoint_id(path: str) -> str:
+    """唯一标识候选：用绝对路径，避免两份 workspace 副本的同名 latest.pt 被合并。"""
+    return str(Path(path).expanduser().resolve())
+
+
+def _git(*args: str):
+    """读取 git 元数据；不在 git 仓库或 git 不可用时返回 None。"""
+    try:
+        return subprocess.run(
+            ["git", *args], cwd=str(HERE), capture_output=True, text=True,
+            timeout=10, check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return None
 
 
 def classify_termination(env, winner: int, max_steps: int) -> str:
@@ -105,16 +133,27 @@ def main():
     ap.add_argument("--candidates", nargs="+", required=True)
     ap.add_argument("--games", type=int, default=100)
     ap.add_argument("--seed-base", type=int, default=90000)
-    ap.add_argument("--baseline", default="HeuristicBotWrapper")
-    ap.add_argument("--out", default=str(HERE / "results" / "tournament.jsonl"))
-    ap.add_argument("--replay", action="store_true", help="额外保存和局/败局的完整逐步回放")
+    ap.add_argument("--baseline", default="HeuristicBotWrapper",
+                    help=f"评测基线名称（可选: {', '.join(BASELINE_REGISTRY)}；默认 HeuristicBotWrapper）")
+    ap.add_argument("--max-steps", type=int, default=240,
+                    help="每局最大步数（默认 240；与历史评测保持可比）")
+    ap.add_argument("--out", default=str(HERE / "results" / "derived" / "tournament.jsonl"),
+                    help="输出 JSONL；默认写 results/derived/，避免覆盖被跟踪归档")
+    ap.add_argument("--replay", action="store_true",
+                    help="保存全部局（胜/负/和）的完整逐步 trace；默认不写 trace")
     args = ap.parse_args()
+
+    if args.baseline not in BASELINE_REGISTRY:
+        ap.error(f"未知基线 --baseline {args.baseline!r}；可选: {', '.join(BASELINE_REGISTRY)}")
+    _load_runtime()
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    baseline = T.HeuristicBotWrapper().cuda().eval()
+    baseline = BASELINE_REGISTRY[args.baseline]().cuda().eval()
 
     ckpt_hashes = {p: sha256(p) for p in args.candidates}
+    impl_sha = sha256(T.__file__)
+    status = _git("status", "--porcelain")
     meta = {
         "type": "meta",
         "impl_file": T.__file__,
@@ -123,8 +162,19 @@ def main():
         "baseline": args.baseline,
         "games_per_candidate": args.games,
         "seed_base": args.seed_base,
-        "max_steps": 240,
+        "max_steps": args.max_steps,
+        "git_commit": _git("rev-parse", "HEAD"),
+        "worktree_dirty": None if status is None else bool(status),
+        "cmdline": list(sys.argv),
+        "python_version": platform.python_version(),
+        "torch_version": torch.__version__,
+        "numpy_version": np.__version__,
+        "impl_file_sha256": impl_sha,
+        "layout_generator_sha256": impl_sha,
+        "eval_tournament_sha256": sha256(str(HERE / "eval_tournament.py")),
+        "analyze_tournament_sha256": sha256(str(HERE / "tools" / "analyze_tournament.py")),
         "checkpoint_sha256": ckpt_hashes,
+        "checkpoint_ids": {checkpoint_id(p): p for p in args.candidates},
         "model_arch": "JunqiActorCritic hidden=160 blocks=8",
         "seat_policy": "even game: model=team0; odd game: model=team1",
     }
@@ -138,15 +188,17 @@ def main():
                 seed = args.seed_base + g
                 model_on_team0 = (g % 2 == 0)
                 if model_on_team0:
-                    rec = play_one(model, baseline, seed)
+                    rec = play_one(model, baseline, seed, max_steps=args.max_steps)
                     model_won = rec["winner_team"] == 0
                 else:
-                    rec = play_one(baseline, model, seed)
+                    rec = play_one(baseline, model, seed, max_steps=args.max_steps)
                     model_won = rec["winner_team"] == 1
                 row = {
                     "type": "game",
                     "checkpoint": Path(ckpt).name,
+                    "checkpoint_id": checkpoint_id(ckpt),
                     "checkpoint_sha256": ckpt_hashes[ckpt][:16],
+                    "checkpoint_sha256_full": ckpt_hashes[ckpt],
                     "game_idx": g,
                     "model_team": 0 if model_on_team0 else 1,
                     "model_won": model_won,
