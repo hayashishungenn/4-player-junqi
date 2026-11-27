@@ -165,6 +165,7 @@ New-Item -ItemType Directory -Force -Path D:\4-player-junqi\results\derived | Ou
   & $base D:\4-player-junqi\tools\analyze_tournament.py --data D:\4-player-junqi\results\derived\tournament_300.jsonl --out D:\4-player-junqi\results\derived\summary_300.json
   ```
 - **产物**：`results/derived/tournament_300.jsonl`、`summary_300.json` 及各自 sha256。
+- **状态更新（2026-11-27）**：✅ 完成；日期 = 2026-11-27；证据路径/sha256 = `results/derived/manifest_p1-01.json`（`d6b2c322642c4bf9dda1010ced8e0ab5ede2cb8a7d89ff2bb67831fe41f82a42`）、`tournament_300.jsonl`（`c203bdc0436f058d28675f67c8dc5c615fd1db82edb8e30f48c9395b2aa90c25`，1501 行）、`summary_300.json`（`40f53e775e6742df6469c9273c4c343dc47b4243090cd048ae741f4f81e7409c`）、`audit_300.json`（`c2f19a57c5902a385d151c665681131478bfde69ee0355ad6a9ad7e3ed385dcc`）、`research/p1-01-result.md`（`500c6ae99fde3bcceeb60a2a406b9114757575ecd162d190f4c73456c9f63991`）；操作者 = Claude Code（本机，用户授权 GPU 时段）。主口径 `W/N`：iter240 60/300=20.0%、pool248 75/300=25.0%、iter688 59/300=19.7%、iter400 118/300=39.3%、iter800 60/300=20.0%，全部未达 65%（最优 Wilson 上界 45.0%）。Holm 校正后 `iter400` 显著优于其余四候选，其中 `iter400 − iter800 = +19.33pp`、CI [+12.67, +26.00]、McNemar b/c=87/29、Holm p=5.18e−07；`iter800` 与三份 pre-fix 两两不可区分。回放审计 56 局 trace 56/56、编码不一致 0、旗通道事件 146；belief 行和违规 50/56、非亮旗精确命中 1750 次（51/56 局），未逐点归因前不得定性为信息泄漏。结论：停止盲目续训，以 iter400 为 post-fix 基线转稳定性改造与 P1-04；两个快照不足以判定 collapse，仅记录显著回退。
 
 ### P1-02 c1732af 修复后基线重训
 
